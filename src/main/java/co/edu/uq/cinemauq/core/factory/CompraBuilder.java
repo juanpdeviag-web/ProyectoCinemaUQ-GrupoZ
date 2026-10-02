@@ -24,10 +24,12 @@ public class CompraBuilder {
         return this;
     }
 
-     public void build() {
+     public Compra build() {
         if (funcion == null || asientos.isEmpty()) {
             throw new IllegalStateException("Una compra requiere al menos una función y un asiento.");
         }
-
-    }
+        else  {
+            return new Compra(funcion, asientos, snacks);
+        }
+     }
 }
