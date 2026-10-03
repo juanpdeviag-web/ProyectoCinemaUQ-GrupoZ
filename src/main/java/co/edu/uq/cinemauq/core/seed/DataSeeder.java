@@ -5,8 +5,12 @@ import co.edu.uq.cinemauq.core.domain.Sala;
 
 import java.util.List;
 
+/**
+ * Clase utilitaria para carga de datos semilla.
+ * Implementa: RF-002 (Consulta de Cartelera), RF-003 (Gestión de Salas)
+ * Regla de Negocio: RN-006 (Protección de datos semilla)
+ */
 
- // Carga datos semilla para pruebas y demostraciones.
 public final class DataSeeder {
 
     private DataSeeder() {

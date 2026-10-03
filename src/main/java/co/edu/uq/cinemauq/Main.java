@@ -7,8 +7,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Esqueleto para continuación del proyecto
         primaryStage.setTitle("CinemaUQ - Gestión de Cine");
-        // El esqueleto queda preparado para lanzar la interfaz en la Entrega 2
         primaryStage.show();
     }
 

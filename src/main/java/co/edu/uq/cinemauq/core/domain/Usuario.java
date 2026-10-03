@@ -1,5 +1,10 @@
 package co.edu.uq.cinemauq.core.domain;
 
+/**
+ * Entidad base para los usuarios del sistema.
+ * Implementa: RF-001 (Registro de Usuarios)
+ */
+
 public abstract class Usuario {
     protected String id;
     protected String nombre;
