@@ -4,6 +4,13 @@ import co.edu.uq.cinemauq.core.domain.Funcion;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder para la construcción de objetos Compra.
+ * Implementa: RF-005 (Compra de Boletos)
+ * Patrón Creacional: Builder
+ * Regla de Negocio: RN-003 (Inmutabilidad de compras)
+ */
+
 public class CompraBuilder {
     private Funcion funcion;
     private List<String> asientos = new ArrayList<>();

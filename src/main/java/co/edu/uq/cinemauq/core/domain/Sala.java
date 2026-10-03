@@ -1,5 +1,11 @@
 package co.edu.uq.cinemauq.core.domain;
 
+/**
+ * Representa una sala de cine.
+ * Implementa: RF-003 (Gestión de Salas), RF-004 (Programación de Funciones)
+ * Regla de Negocio: RN-004 (Cálculo de capacidad de sala)
+ */
+
 public class Sala {
     private String numero;
     private int capacidadFilas;

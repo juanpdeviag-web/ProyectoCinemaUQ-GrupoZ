@@ -7,6 +7,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Factory Method para la creación de usuarios.
+ * Implementa: RF-001 (Registro de Usuarios)
+ * Patrón Creacional: Factory Method
+ * Regla de Negocio: RN-005 (Normalización de tipos de usuario)
+ */
+
 public class UsuarioFactory {
     public static Usuario crearUsuario(String tipo, String id, String nombre, String correo) {
         if (tipo.equalsIgnoreCase("CLIENTE")) {
