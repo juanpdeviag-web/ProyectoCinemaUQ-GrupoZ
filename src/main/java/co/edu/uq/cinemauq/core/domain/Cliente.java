@@ -18,4 +18,6 @@ public class Cliente extends Usuario {
 
     @Override
     public String getRol() { return "CLIENTE"; }
+
+    public TarjetaVirtual getTarjetaVirtual() { return tarjeta; }
 }

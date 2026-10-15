@@ -16,5 +16,11 @@ public abstract class Usuario {
         this.correo = correo;
     }
 
+    public String getId() { return id; }
+
+    public String getNombre() { return nombre; }
+
+    public String getCorreo() { return correo; }
+
     public abstract String getRol();
 }
