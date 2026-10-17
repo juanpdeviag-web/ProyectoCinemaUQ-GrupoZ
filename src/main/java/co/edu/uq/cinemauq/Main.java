@@ -1,25 +1,26 @@
 package co.edu.uq.cinemauq;
 
+import co.edu.uq.cinemauq.ui.models.SesionCompra;
+import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/views/cartelera.fxml"));
-        Parent root = loader.load();
-        
-        Scene scene = new Scene(root, 900, 700);
+    public void start(Stage primaryStage) {
+        // Crear la sesión de compra compartida
+        SesionCompra sesionCompra = new SesionCompra();
+
+        // Inicializar el navegador con el Stage y la sesión
+        Navegador.inicializar(primaryStage, sesionCompra);
+
+        // Configurar el Stage con resolución 1920x1080
         primaryStage.setTitle("CinemaUQ - Gestión de Cine");
-        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.show();
+
+        // Navegar a la pantalla inicial (cartelera)
+        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
 
     public static void main(String[] args) {

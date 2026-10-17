@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.TarjetaVirtualController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Label text="Tarjeta Virtual" styleClass="title">
+                <font>
+                    <Font name="Arial Bold" size="32"/>
+                </font>
+            </Label>
+            <Label text="Gestiona tu saldo y realiza pagos" styleClass="subtitle">
+                <font>
+                    <Font name="Arial" size="18"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="20" styleClass="content" alignment="CENTER">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <VBox fx:id="tarjetaCard" spacing="15" styleClass="tarjeta-card" maxWidth="400">
+                    <Label fx:id="numeroTarjetaLabel" text="Tarjeta: -" styleClass="saldo-label">
+                        <font>
+                            <Font name="Arial Bold" size="16"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="saldoLabel" text="Saldo: $0.00" styleClass="saldo-valor"/>
+                    <Label fx:id="estadoLabel" text="Estado: -" styleClass="saldo-label"/>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="resumen-container" maxWidth="400">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label text="Recargar saldo:" styleClass="section-title">
+                        <font>
+                            <Font name="Arial Bold" size="16"/>
+                        </font>
+                    </Label>
+                    <HBox spacing="10">
+                        <TextField fx:id="recargaTextField" promptText="Monto" prefWidth="150"/>
+                        <Button fx:id="btnRecargar" text="Recargar" onAction="#onRecargar" styleClass="button-primary"/>
+                    </HBox>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="resumen-container" maxWidth="400">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label text="Total a pagar:" styleClass="section-title">
+                        <font>
+                            <Font name="Arial Bold" size="16"/>
+                        </font>
+                    </Label>
+                    <Label text="El total se calculará del resumen de compra" styleClass="resumen-label"/>
+                </VBox>
+                
+                <ListView fx:id="historialListView" prefHeight="200" styleClass="historial-list"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" styleClass="footer">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
+            <Button fx:id="btnHistorial" text="Ver Historial" onAction="#onHistorial" styleClass="button-secondary"/>
+            <Button fx:id="btnPagar" text="Pagar Compra" onAction="#onPagar" styleClass="button-primary"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

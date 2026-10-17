@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.CarteleraController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <HBox alignment="CENTER" spacing="20">
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                    <VBox spacing="10">
+                        <Label text="CinemaUQ" styleClass="title">
+                            <font>
+                                <Font name="Arial Bold" size="32"/>
+                            </font>
+                        </Label>
+                        <Label text="Cartelera de Películas" styleClass="subtitle">
+                            <font>
+                                <Font name="Arial" size="18"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <VBox spacing="5" styleClass="perfil-container">
+                        <padding>
+                            <Insets top="5" right="15" bottom="5" left="15"/>
+                        </padding>
+                        <Label fx:id="perfilNombreLabel" text="" styleClass="perfil-nombre">
+                            <font>
+                                <Font name="Arial Bold" size="16"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="perfilRolLabel" text="" styleClass="perfil-rol">
+                            <font>
+                                <Font name="Arial" size="14"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+                <Button fx:id="btnLogin" text="Log In" onAction="#onLogin" styleClass="button-primary" prefWidth="120" prefHeight="40"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="20" styleClass="content">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <Label text="Selecciona una película:" styleClass="section-title">
+                    <font>
+                        <Font name="Arial Bold" size="20"/>
+                    </font>
+                </Label>
+                
+                <TilePane fx:id="peliculasTilePane" 
+                          prefColumns="3" 
+                          hgap="20" 
+                          vgap="20"
+                          styleClass="tile-pane">
+                </TilePane>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" styleClass="footer">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Button text="Salir" onAction="#onSalir" styleClass="button-secondary"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

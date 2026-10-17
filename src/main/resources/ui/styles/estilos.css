@@ -1,0 +1,354 @@
+/* Estilos generales - Paleta cremosa moderna */
+.root {
+    -fx-background-color: #F5F0E6;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+/* Header */
+.header {
+    -fx-background-color: #E8DFD0;
+    -fx-background-radius: 0 0 15 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 10, 0, 0, 5);
+}
+
+.title {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+}
+
+.subtitle {
+    -fx-text-fill: #6B5B4F;
+    -fx-font-size: 16px;
+}
+
+/* Contenedor de perfil de usuario */
+.perfil-container {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 5, 0, 0, 2);
+}
+
+.perfil-nombre {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+}
+
+.perfil-rol {
+    -fx-text-fill: #6B5B4F;
+}
+
+/* Contenido principal */
+.content {
+    -fx-background-color: #F5F0E6;
+}
+
+.section-title {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+}
+
+/* TilePane para películas */
+.tile-pane {
+    -fx-background-color: #E8DFD0;
+    -fx-padding: 20;
+    -fx-background-radius: 15;
+}
+
+/* Tarjeta de película */
+.pelicula-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-pref-width: 280;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 8, 0, 0, 4);
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+.pelicula-card:hover {
+    -fx-background-color: #FAF8F5;
+    -fx-border-color: #C4A77D;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.pelicula-titulo {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-wrap-text: true;
+}
+
+.pelicula-genero {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 15px;
+}
+
+.pelicula-duracion {
+    -fx-text-fill: #A89888;
+    -fx-font-size: 13px;
+}
+
+/* Footer */
+.footer {
+    -fx-background-color: #E8DFD0;
+    -fx-background-radius: 15 15 0 0;
+}
+
+/* Botones */
+.button-primary {
+    -fx-background-color: #C4A77D;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 25;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.button-primary:hover {
+    -fx-background-color: #B8976D;
+}
+
+.button-secondary {
+    -fx-background-color: #D4C4A8;
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 25;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.button-secondary:hover {
+    -fx-background-color: #C8B898;
+}
+
+/* Asientos */
+.asiento {
+    -fx-min-width: 50;
+    -fx-min-height: 50;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.asiento-disponible {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #4A3F35;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+}
+
+.asiento-disponible:hover {
+    -fx-background-color: #FAF8F5;
+    -fx-border-color: #C4A77D;
+}
+
+.asiento-seleccionado {
+    -fx-background-color: #C4A77D;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #8B7355;
+    -fx-border-width: 2;
+}
+
+.asiento-ocupado {
+    -fx-background-color: #D8D0C0;
+    -fx-text-fill: #A89888;
+    -fx-cursor: default;
+    -fx-border-color: #C8B898;
+    -fx-border-width: 2;
+}
+
+/* Productos de confitería */
+.producto-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-pref-width: 220;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.1), 5, 0, 0, 3);
+}
+
+.producto-nombre {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.producto-precio {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+/* Resumen de compra */
+.resumen-container {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 25;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.1), 5, 0, 0, 3);
+}
+
+.resumen-label {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 15px;
+}
+
+.resumen-total {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+/* Tarjeta virtual */
+.tarjeta-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #E8DFD0, #D4C4A8);
+    -fx-background-radius: 20;
+    -fx-padding: 40;
+    -fx-border-color: #C4A77D;
+    -fx-border-width: 3;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 10, 0, 0, 5);
+}
+
+.saldo-label {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 16px;
+}
+
+.saldo-valor {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+    -fx-font-size: 36px;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: #F5F0E6;
+    -fx-border-color: #E8DFD0;
+}
+
+.scroll-bar {
+    -fx-background-color: #E8DFD0;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #C4A77D;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #B8976D;
+}
+
+/* Funciones */
+.funciones-container {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 25;
+    -fx-background-radius: 15;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+.funcion-card {
+    -fx-background-color: #FAF8F5;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.1), 5, 0, 0, 3);
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+}
+
+.funcion-card:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C4A77D;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.funcion-fecha {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+.funcion-sala {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 16px;
+}
+
+.funcion-capacidad {
+    -fx-text-fill: #A89888;
+    -fx-font-size: 14px;
+}
+
+/* Asientos adicionales */
+.asientos-grid {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 25;
+    -fx-background-radius: 15;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+.pantalla-indicator {
+    -fx-background-color: #C4A77D;
+    -fx-background-radius: 8;
+    -fx-pref-height: 12;
+}
+
+.leyenda-container {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.leyenda-label {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 15px;
+}
+
+/* Confitería adicional */
+.producto-cantidad {
+    -fx-text-fill: #A89888;
+    -fx-font-size: 13px;
+}
+
+/* Historial de transacciones */
+.historial-list {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.historial-list .list-cell {
+    -fx-background-color: #FAF8F5;
+    -fx-text-fill: #4A3F35;
+    -fx-border-color: #E8DFD0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.historial-list .list-cell:selected {
+    -fx-background-color: #C4A77D;
+    -fx-text-fill: #FFFFFF;
+}

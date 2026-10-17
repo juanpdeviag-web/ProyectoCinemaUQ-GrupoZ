@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.CompraController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Label text="Resumen de Compra" styleClass="title">
+                <font>
+                    <Font name="Arial Bold" size="32"/>
+                </font>
+            </Label>
+            <Label text="Revisa tu compra antes de confirmar" styleClass="subtitle">
+                <font>
+                    <Font name="Arial" size="18"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="20" styleClass="content">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <VBox fx:id="resumenContainer" spacing="15" styleClass="resumen-container">
+                    <Label fx:id="peliculaLabel" text="Película: -" styleClass="resumen-label"/>
+                    <Label fx:id="funcionLabel" text="Función: -" styleClass="resumen-label"/>
+                    <Label fx:id="asientosLabel" text="Asientos: -" styleClass="resumen-label"/>
+                    <Label fx:id="productosLabel" text="Productos: -" styleClass="resumen-label"/>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="resumen-container">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label text="Descuentos disponibles:" styleClass="section-title">
+                        <font>
+                            <Font name="Arial Bold" size="16"/>
+                        </font>
+                    </Label>
+                    <CheckBox fx:id="chkDescuentoFijo" text="Descuento fijo de $5.00" styleClass="resumen-label"/>
+                    <CheckBox fx:id="chkPromocion" text="Promoción estudiante (10%)" styleClass="resumen-label"/>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="resumen-container">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label fx:id="subtotalLabel" text="Subtotal: $0.00" styleClass="resumen-label"/>
+                    <Label fx:id="descuentoLabel" text="Descuento: $0.00" styleClass="resumen-label"/>
+                    <Label fx:id="totalLabel" text="Total: $0.00" styleClass="resumen-total"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" styleClass="footer">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
+            <Button fx:id="btnConfirmar" text="Confirmar Compra" onAction="#onConfirmar" styleClass="button-primary" disable="true"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
