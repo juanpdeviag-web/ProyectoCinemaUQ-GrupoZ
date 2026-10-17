@@ -1,4 +1,5 @@
 package co.edu.uq.cinemauq.core.domain;
+import co.edu.uq.cinemauq.core.exceptions.UsuarioException;
 
 /**
  * Representa un cliente del sistema.
@@ -18,4 +19,47 @@ public class Cliente extends Usuario {
 
     @Override
     public String getRol() { return "CLIENTE"; }
+
+
+
+    @Override
+    public void validar() {
+        super.validar();
+        if (this.tarjeta == null) {
+            throw new UsuarioException("El cliente debe tener una tarjeta virtual asociada (RN-001)");
+        }
+        if (this.puntos < 0) {
+            throw new UsuarioException("Los puntos del cliente no pueden ser negativos");
+        }
+    }
+
+    public void agregarPuntos(int cantidad) {
+        if (cantidad < 0) {
+            throw new UsuarioException("La cantidad de puntos para agregar deben ser positivas");
+        }
+        this.puntos += cantidad;
+    }
+
+    public boolean verificarPuntosAcumulados(int puntosRequeridos) {
+        if (puntosRequeridos < 0) {
+            throw new UsuarioException("Los puntos requeridos no pueden ser negativos");
+        }
+        return this.puntos >= puntosRequeridos;
+    }
+
+    public TarjetaVirtual getTarjeta() {
+        return tarjeta;
+    }
+
+    public void setTarjeta(TarjetaVirtual tarjeta) {
+        if (tarjeta == null) {
+            throw new UsuarioException("La tarjeta virtual asociada no puede ser nula (RN-001)");
+        }
+        this.tarjeta = tarjeta;
+    }
+
+    public int getPuntos() {
+        return puntos;
+    }
+
 }

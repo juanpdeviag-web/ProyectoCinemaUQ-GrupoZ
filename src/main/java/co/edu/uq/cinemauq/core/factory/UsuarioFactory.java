@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import co.edu.uq.cinemauq.core.exceptions.DatosInvalidosException;
+import co.edu.uq.cinemauq.core.exceptions.UsuarioDuplicadoException;
 
 /**
  * Factory Method para la creación de usuarios.
@@ -57,4 +59,35 @@ public class UsuarioFactory {
 
         return creador.apply(new DatosUsuario(id, nombre, correo));
     }
+
+
+
+    public static void validarDatosCreacion(String tipo, String id, String nombre, String correo) {
+        if (tipo == null || tipo.trim().isEmpty()) {
+            throw new DatosInvalidosException("El tipo de usuario no puede estar vacío (RF-001)");
+        }
+        if (!tipo.equalsIgnoreCase("CLIENTE") && !tipo.equalsIgnoreCase("ADMINISTRADOR")) {
+            throw new DatosInvalidosException("Tipo de usuario no válido: " + tipo);
+        }
+        if (id == null || id.trim().isEmpty()) {
+            throw new DatosInvalidosException("El ID del usuario no puede ser nulo o vacío (RF-001)");
+        }
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new DatosInvalidosException("El nombre del usuario no puede estar vacío (RF-001)");
+        }
+        if (correo == null || !correo.contains("@")) {
+            throw new DatosInvalidosException("El correo del usuario es inválido (RF-001)");
+        }
+    }
+
+    public static Usuario crearUsuarioValidado(String tipo, String id, String nombre, String correo, boolean yaExiste) {
+        validarDatosCreacion(tipo, id, nombre, correo);
+        if (yaExiste) {
+            throw new UsuarioDuplicadoException(id);
+        }
+        Usuario usuario = crearUsuario(tipo, id, nombre, correo);
+        usuario.validar();
+        return usuario;
+    }
+
 }
