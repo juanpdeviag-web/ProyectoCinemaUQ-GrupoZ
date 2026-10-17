@@ -1,10 +1,8 @@
 package co.edu.uq.cinemauq.core.domain;
+
 import co.edu.uq.cinemauq.core.exceptions.MontoInvalidoException;
 import co.edu.uq.cinemauq.core.exceptions.SaldoInsuficienteException;
 import co.edu.uq.cinemauq.core.exceptions.TarjetaInactivaException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ public class TarjetaVirtual {
     final private String numeroTarjeta;
     final private LocalDateTime fechaCreacion;
     private LocalDateTime fechaUltimaActividad;
-    final private List<Transaccion> historialTransacciones;
+    private final List<Transaccion> historialTransacciones;
 
     public TarjetaVirtual() {
         this.saldo = 0.0;
@@ -29,15 +27,32 @@ public class TarjetaVirtual {
         this.historialTransacciones = new ArrayList<>();
     }
 
-    public double getSaldo() { return saldo; }
-    public boolean isActiva() { return activa; }
-    public String getNumeroTarjeta() { return numeroTarjeta; }
-    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-    public LocalDateTime getFechaUltimaActividad() { return fechaUltimaActividad; }
+    public double getSaldo() { 
+        return saldo; 
+    }
+    
+    public boolean isActiva() { 
+        return activa; 
+    }
+    
+    public String getNumeroTarjeta() { 
+        return numeroTarjeta; 
+    }
+    
+    public LocalDateTime getFechaCreacion() { 
+        return fechaCreacion; 
+    }
+    
+    public LocalDateTime getFechaUltimaActividad() { 
+        return fechaUltimaActividad; 
+    }
 
     public void recargar(double monto) {
+        if (!this.activa) {
+            throw new TarjetaInactivaException("No se puede recargar a una tarjeta inactiva");
+        }
         if (monto <= 0) {
-            throw new IllegalArgumentException("El monto de recarga debe ser positivo");
+            throw new MontoInvalidoException("El monto de recarga debe ser positivo (RN-002)");
         }
         double saldoAnterior = this.saldo;
         this.saldo += monto;
@@ -56,10 +71,13 @@ public class TarjetaVirtual {
 
     public void deducir(double monto) {
         if (monto <= 0) {
-            throw new IllegalArgumentException("El monto a deducir debe ser positivo");
+            throw new MontoInvalidoException("El monto a deducir debe ser positivo (RN-002)");
+        }
+        if (!this.activa) {
+            throw new TarjetaInactivaException("La tarjeta virtual está inactiva");
         }
         if (!validarSaldoSuficiente(monto)) {
-            throw new IllegalStateException("Saldo insuficiente");
+            throw new SaldoInsuficienteException(this.saldo, monto);
         }
         double saldoAnterior = this.saldo;
         this.saldo -= monto;
@@ -106,6 +124,11 @@ public class TarjetaVirtual {
         actualizarActividad();
     }
 
+    public void setActiva(boolean activa) {
+        this.activa = activa;
+        actualizarActividad();
+    }
+
     public String obtenerResumenTransacciones() {
         if (historialTransacciones.isEmpty()) {
             return "No hay transacciones registradas";
@@ -144,45 +167,4 @@ public class TarjetaVirtual {
     private String generarNumeroTarjeta() {
         return "TV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-
-
-    private final List<String> historialTransacciones = new ArrayList<>();
-
-    public void validarRecarga(double monto) {
-        if (!this.activa) {
-            throw new TarjetaInactivaException("No se puede recargar a una tarjeta inactiva");
-        }
-        if (monto <= 0) {
-            throw new MontoInvalidoException("El monto de recarga debe ser positivo (RN-002)");
-        }
-        this.saldo += monto;
-        this.historialTransacciones.add("RECARGA: +" + monto + " | Saldo: " + this.saldo);
-    }
-
-    public boolean validarSaldoSuficiente(double monto) {
-        if (!this.activa) {
-            throw new TarjetaInactivaException("La tarjeta virtual esta inactiva");
-        }
-        if (monto <= 0) {
-            throw new MontoInvalidoException("El monto a validar debe ser positivo (RN-002)");
-        }
-        return this.saldo >= monto;
-    }
-
-    public void deducir(double monto) {
-        if (!validarSaldoSuficiente(monto)) {
-            throw new SaldoInsuficienteException(this.saldo, monto);
-        }
-        this.saldo -= monto;
-        this.historialTransacciones.add("DEDUCCION: -" + monto + " | Saldo: " + this.saldo);
-    }
-
-    public void setActiva(boolean activa) {
-        this.activa = activa;
-    }
-
-    public List<String> getHistorialTransacciones() {
-        return Collections.unmodifiableList(historialTransacciones);
-    }
-
 }

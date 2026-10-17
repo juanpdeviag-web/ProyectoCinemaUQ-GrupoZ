@@ -51,6 +51,10 @@ public class Cliente extends Usuario {
         return tarjeta;
     }
 
+    public TarjetaVirtual getTarjetaVirtual() {
+        return tarjeta;
+    }
+
     public void setTarjeta(TarjetaVirtual tarjeta) {
         if (tarjeta == null) {
             throw new UsuarioException("La tarjeta virtual asociada no puede ser nula (RN-001)");
