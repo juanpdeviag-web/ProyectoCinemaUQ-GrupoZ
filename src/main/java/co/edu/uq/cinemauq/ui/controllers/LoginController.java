@@ -8,10 +8,10 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.PasswordField;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     @FXML
-    private ComboBox<Usuario> usuarioComboBox;
+    private TilePane usuariosTilePane;
 
     @FXML
     private PasswordField contrasenaField;
@@ -46,49 +46,56 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cargarUsuarios();
-        configurarComboBox();
     }
 
     private void cargarUsuarios() {
         List<Usuario> usuarios = UserSeeder.cargarUsuarios();
-        usuarioComboBox.getItems().addAll(usuarios);
+        
+        for (Usuario usuario : usuarios) {
+            VBox usuarioCard = crearTarjetaUsuario(usuario);
+            usuariosTilePane.getChildren().add(usuarioCard);
+        }
     }
 
-    private void configurarComboBox() {
-        // Personalizar cómo se muestran los usuarios en el ComboBox
-        usuarioComboBox.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(Usuario usuario, boolean empty) {
-                super.updateItem(usuario, empty);
-                if (empty || usuario == null) {
-                    setText(null);
-                } else {
-                    String rol = usuario instanceof Administrador ? "ADMIN" : "CLIENTE";
-                    setText(usuario.getNombre() + " (" + rol + ") - " + usuario.getCorreo());
-                }
-            }
-        });
+    private VBox crearTarjetaUsuario(Usuario usuario) {
+        VBox card = new VBox();
+        card.getStyleClass().add("usuario-card");
+        card.setSpacing(12);
 
-        // Personalizar el texto del item seleccionado
-        usuarioComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Usuario usuario, boolean empty) {
-                super.updateItem(usuario, empty);
-                if (empty || usuario == null) {
-                    setText(null);
-                } else {
-                    String rol = usuario instanceof Administrador ? "ADMIN" : "CLIENTE";
-                    setText(usuario.getNombre() + " (" + rol + ")");
-                }
-            }
-        });
+        // Icono según rol
+        Label iconoLabel = new Label(usuario instanceof Administrador ? "👨‍💼" : "👤");
+        iconoLabel.getStyleClass().add("usuario-icono");
 
-        // Manejar selección de usuario
-        usuarioComboBox.setOnAction(event -> onUsuarioSeleccionado());
+        Label nombreLabel = new Label(usuario.getNombre());
+        nombreLabel.getStyleClass().add("usuario-nombre");
+        nombreLabel.setWrapText(true);
+
+        Label rolLabel = new Label(usuario instanceof Administrador ? "Administrador" : "Cliente");
+        rolLabel.getStyleClass().add("usuario-rol");
+
+        Label correoLabel = new Label(usuario.getCorreo());
+        correoLabel.getStyleClass().add("usuario-correo");
+        correoLabel.setWrapText(true);
+
+        card.getChildren().addAll(iconoLabel, nombreLabel, rolLabel, correoLabel);
+
+        // Al hacer clic en la tarjeta, seleccionar el usuario
+        card.setOnMouseClicked(event -> onUsuarioSeleccionado(usuario));
+
+        return card;
     }
 
-    private void onUsuarioSeleccionado() {
-        usuarioSeleccionado = usuarioComboBox.getValue();
+    private void onUsuarioSeleccionado(Usuario usuario) {
+        usuarioSeleccionado = usuario;
+
+        // Deseleccionar todas las tarjetas
+        for (javafx.scene.Node node : usuariosTilePane.getChildren()) {
+            node.getStyleClass().remove("usuario-card-selected");
+        }
+
+        // Seleccionar la tarjeta clickeada
+        VBox selectedCard = (VBox) usuariosTilePane.getChildren().get(UserSeeder.cargarUsuarios().indexOf(usuario));
+        selectedCard.getStyleClass().add("usuario-card-selected");
 
         if (usuarioSeleccionado != null) {
             System.out.println("Usuario seleccionado: " + usuarioSeleccionado.getNombre() + " (" + usuarioSeleccionado.getId() + ")");

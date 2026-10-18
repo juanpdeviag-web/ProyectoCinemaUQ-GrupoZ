@@ -26,11 +26,17 @@ import java.util.ResourceBundle;
 public class TarjetaVirtualController implements Initializable {
     
     @FXML
-    private Label numeroTarjetaLabel;
-    
+    private Label codigoTarjetaLabel;
+
+    @FXML
+    private Label nombreUsuarioLabel;
+
+    @FXML
+    private Label descuentosLabel;
+
     @FXML
     private Label saldoLabel;
-    
+
     @FXML
     private Label estadoLabel;
     
@@ -66,27 +72,33 @@ public class TarjetaVirtualController implements Initializable {
     
     public void cargarDatos(SesionCompra sesionCompra) {
         this.sesionCompra = sesionCompra;
-        
-        // Crear un cliente de prueba con tarjeta virtual
-        this.cliente = new Cliente("CLI001", "Usuario Prueba", "usuario@test.com");
+
+        // Obtener el cliente actual del navegador
+        this.cliente = (Cliente) Navegador.getUsuarioActual();
+        if (this.cliente == null) {
+            // Crear un cliente de prueba con tarjeta virtual
+            this.cliente = new Cliente("CLI001", "Usuario Prueba", "usuario@test.com");
+        }
         this.tarjeta = cliente.getTarjeta();
 
         // Recargar saldo inicial para pruebas (COP)
         tarjeta.recargar(100000.0); // $100,000 COP
-        
+
         mostrarInformacionTarjeta();
     }
-    
+
     private void mostrarInformacionTarjeta() {
-        numeroTarjetaLabel.setText("Tarjeta: " + tarjeta.getNumeroTarjeta());
-        saldoLabel.setText(String.format("Saldo: COP $%,.2f", tarjeta.getSaldo()));
+        codigoTarjetaLabel.setText("CÓDIGO: " + tarjeta.getNumeroTarjeta());
+        nombreUsuarioLabel.setText("Titular: " + cliente.getNombre());
+        descuentosLabel.setText("Descuentos: " + (cliente.getTarjeta().getDescuentos().isEmpty() ? "Ninguno" : String.join(", ", cliente.getTarjeta().getDescuentos())));
+        saldoLabel.setText(String.format("$%,.0f", tarjeta.getSaldo()));
 
         if (tarjeta.isActiva()) {
-            estadoLabel.setText("Estado: Activa");
-            estadoLabel.setStyle("-fx-text-fill: #00ff00;");
+            estadoLabel.setText("✅ Activa");
+            estadoLabel.setStyle("-fx-text-fill: #4CAF50;");
         } else {
-            estadoLabel.setText("Estado: Inactiva");
-            estadoLabel.setStyle("-fx-text-fill: #ff0000;");
+            estadoLabel.setText("❌ Inactiva");
+            estadoLabel.setStyle("-fx-text-fill: #e94560;");
         }
     }
     

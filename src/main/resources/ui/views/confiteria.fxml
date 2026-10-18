@@ -19,16 +19,16 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="25" right="30" bottom="25" left="30"/>
             </padding>
-            <Label text="Confitería" styleClass="title">
+            <Label text="🍿 Confitería" styleClass="title">
                 <font>
-                    <Font name="Arial Bold" size="32"/>
+                    <Font name="Segoe UI Bold" size="36"/>
                 </font>
             </Label>
             <Label text="Selecciona tus productos y combos" styleClass="subtitle">
                 <font>
-                    <Font name="Arial" size="18"/>
+                    <Font name="Segoe UI" size="18"/>
                 </font>
             </Label>
         </VBox>
@@ -36,21 +36,21 @@
 
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
-            <VBox spacing="20" styleClass="content">
+            <VBox spacing="25" styleClass="content">
                 <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
+                    <Insets top="25" right="30" bottom="25" left="30"/>
                 </padding>
                 
-                <Label text="Productos y Combos:" styleClass="section-title">
+                <Label text="🥤 Productos y Combos:" styleClass="section-title">
                     <font>
-                        <Font name="Arial Bold" size="20"/>
+                        <Font name="Segoe UI Bold" size="20"/>
                     </font>
                 </Label>
                 
                 <TilePane fx:id="productosTilePane" 
-                          prefColumns="3" 
-                          hgap="20" 
-                          vgap="20"
+                          prefColumns="4" 
+                          hgap="25" 
+                          vgap="25"
                           styleClass="tile-pane">
                 </TilePane>
             </VBox>
@@ -58,9 +58,9 @@
     </center>
 
     <bottom>
-        <VBox spacing="10" styleClass="footer">
+        <VBox spacing="15" styleClass="footer">
             <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
+                <Insets top="20" right="30" bottom="20" left="30"/>
             </padding>
             <HBox spacing="20" alignment="CENTER">
                 <Label fx:id="productosSeleccionadosLabel" text="Ningún producto seleccionado" styleClass="resumen-label"/>

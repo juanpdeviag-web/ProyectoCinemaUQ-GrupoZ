@@ -77,39 +77,43 @@ public class CompraController implements Initializable {
     private void mostrarResumen() {
         // Información de película y función
         if (sesionCompra.tienePeliculaSeleccionada()) {
-            peliculaLabel.setText("Película: " + sesionCompra.getPeliculaSeleccionada().getTitulo());
+            peliculaLabel.setText(sesionCompra.getPeliculaSeleccionada().getTitulo());
+        } else {
+            peliculaLabel.setText("-");
         }
-        
+
         if (sesionCompra.tieneFuncionSeleccionada()) {
             Funcion funcion = sesionCompra.getFuncionSeleccionada();
             String fechaHora = FuncionesGenerator.formatearFechaHora(funcion.getFechaHora());
-            funcionLabel.setText("Función: " + fechaHora + " - Sala " + funcion.getSala().getNumero());
+            funcionLabel.setText(fechaHora + " - Sala " + funcion.getSala().getNumero());
+        } else {
+            funcionLabel.setText("-");
         }
-        
+
         // Asientos
         if (sesionCompra.tieneAsientosSeleccionados()) {
-            asientosLabel.setText("Asientos: " + String.join(", ", sesionCompra.getAsientosSeleccionados()));
+            asientosLabel.setText(String.join(", ", sesionCompra.getAsientosSeleccionados()));
         } else {
-            asientosLabel.setText("Asientos: Ninguno seleccionado");
+            asientosLabel.setText("Ninguno seleccionado");
         }
-        
+
         // Productos de confitería
         if (!sesionCompra.getProductosSeleccionados().isEmpty()) {
-            StringBuilder productosText = new StringBuilder("Productos: ");
+            StringBuilder productosText = new StringBuilder();
             for (ItemCompra item : sesionCompra.getProductosSeleccionados()) {
                 productosText.append(item.getNombre()).append(", ");
             }
             productosLabel.setText(productosText.substring(0, productosText.length() - 2));
         } else {
-            productosLabel.setText("Productos: Ninguno");
+            productosLabel.setText("Ninguno");
         }
-        
+
         actualizarTotal();
     }
     
     private void actualizarTotal() {
         double subtotal = sesionCompra.calcularTotal();
-        subtotalLabel.setText(String.format("Subtotal: COP $%,.2f", subtotal));
+        subtotalLabel.setText(String.format("COP $%,.0f", subtotal));
 
         // Aplicar descuentos usando pattern Decorator
         co.edu.uq.cinemauq.patterns.decorator.Compra compra = new CompraBase("Compra de entradas y confitería", subtotal);
@@ -128,36 +132,88 @@ public class CompraController implements Initializable {
 
         double totalFinal = compra.precio();
 
-        descuentoLabel.setText(String.format("Descuento: -COP $%,.2f", descuentoTotal));
-        totalLabel.setText(String.format("Total: COP $%,.2f", totalFinal));
-        
+        descuentoLabel.setText(String.format("-COP $%,.0f", descuentoTotal));
+        totalLabel.setText(String.format("COP $%,.0f", totalFinal));
+
         // Habilitar botón confirmar solo si hay asientos seleccionados
         btnConfirmar.setDisable(!sesionCompra.tieneAsientosSeleccionados());
     }
     
     @FXML
     private void onConfirmar() {
+        System.out.println("=== DIAGNÓSTICO DE COMPRA ===");
+
+        // Verificar sesión de compra
+        if (sesionCompra == null) {
+            System.err.println("❌ ERROR: Sesión de compra es null");
+            return;
+        }
+        System.out.println("✅ Sesión de compra existe");
+
+        // Verificar película seleccionada
+        if (!sesionCompra.tienePeliculaSeleccionada()) {
+            System.err.println("❌ ERROR: No hay película seleccionada");
+            return;
+        }
+        System.out.println("✅ Película seleccionada: " + sesionCompra.getPeliculaSeleccionada().getTitulo());
+
+        // Verificar función seleccionada
+        if (!sesionCompra.tieneFuncionSeleccionada()) {
+            System.err.println("❌ ERROR: No hay función seleccionada");
+            return;
+        }
+        System.out.println("✅ Función seleccionada: " + sesionCompra.getFuncionSeleccionada().getFechaHora());
+
+        // Verificar asientos seleccionados
+        if (!sesionCompra.tieneAsientosSeleccionados()) {
+            System.err.println("❌ ERROR: No hay asientos seleccionados");
+            return;
+        }
+        System.out.println("✅ Asientos seleccionados: " + String.join(", ", sesionCompra.getAsientosSeleccionados()));
+
+        // Verificar usuario actual
+        if (Navegador.getUsuarioActual() == null) {
+            System.err.println("❌ ERROR: No hay usuario logueado");
+            return;
+        }
+        System.out.println("✅ Usuario logueado: " + Navegador.getUsuarioActual().getNombre());
+
+        // Calcular totales
+        double precioEntrada = sesionCompra.getPrecioEntrada();
+        double precioProductos = sesionCompra.getPrecioProductos();
+        double subtotal = sesionCompra.calcularTotal();
+        System.out.println("💰 Precio entrada: $" + precioEntrada);
+        System.out.println("💰 Precio productos: $" + precioProductos);
+        System.out.println("💰 Subtotal: $" + subtotal);
+
         // Validar compra usando CompraFacade
         try {
             CompraFacade facade = new CompraFacade();
-            String funcionInfo = sesionCompra.tieneFuncionSeleccionada() ? 
+            String funcionInfo = sesionCompra.tieneFuncionSeleccionada() ?
                 FuncionesGenerator.formatearFechaHora(sesionCompra.getFuncionSeleccionada().getFechaHora()) : "";
-            
+
             CompraFacade.Resumen resumen = facade.prepararCompra(
                 funcionInfo,
                 sesionCompra.getAsientosSeleccionados(),
                 sesionCompra.getProductosSeleccionados().stream().map(ItemCompra::getNombre).toList(),
-                sesionCompra.getPrecioEntrada(),
-                sesionCompra.getPrecioProductos()
+                precioEntrada,
+                precioProductos
             );
-            
-            System.out.println("Compra validada: " + resumen.detalle());
-            System.out.println("Total: $" + resumen.total());
-            
+
+            System.out.println("✅ Compra validada exitosamente");
+            System.out.println("📋 Detalle: " + resumen.detalle());
+            System.out.println("💵 Total final: $" + resumen.total());
+
             // Navegar a tarjeta virtual para pago
+            System.out.println("🔄 Navegando a tarjeta virtual...");
             Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
+            System.out.println("✅ Navegación completada");
         } catch (IllegalArgumentException e) {
-            System.err.println("Error de validación: " + e.getMessage());
+            System.err.println("❌ ERROR de validación: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ ERROR inesperado: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

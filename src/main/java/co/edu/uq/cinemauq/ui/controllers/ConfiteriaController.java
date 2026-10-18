@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
@@ -104,43 +105,71 @@ public class ConfiteriaController implements Initializable {
     private VBox crearTarjetaProducto(ItemCompra producto) {
         VBox card = new VBox();
         card.getStyleClass().add("producto-card");
-        card.setSpacing(10);
-        
+        card.setSpacing(12);
+        card.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Label iconoLabel = new Label(obtenerIconoProducto(producto.getNombre()));
+        iconoLabel.getStyleClass().add("producto-icono");
+
         Label nombreLabel = new Label(producto.getNombre());
         nombreLabel.getStyleClass().add("producto-nombre");
-        
-        Label precioLabel = new Label(String.format("COP $%,.2f", producto.getPrecio()));
+        nombreLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Label precioLabel = new Label(String.format("$%,.0f", producto.getPrecio()));
         precioLabel.getStyleClass().add("producto-precio");
-        
-        Button btnAgregar = new Button("Agregar");
-        btnAgregar.getStyleClass().add("button-primary");
-        btnAgregar.setOnAction(event -> onAgregarProducto(producto));
-        
-        Button btnRemover = new Button("Quitar");
-        btnRemover.getStyleClass().add("button-secondary");
-        btnRemover.setOnAction(event -> onRemoverProducto(producto));
-        
-        Label cantidadLabel = new Label("Cantidad: 0");
-        cantidadLabel.getStyleClass().add("producto-cantidad");
-        
-        card.getChildren().addAll(nombreLabel, precioLabel, cantidadLabel, btnAgregar, btnRemover);
-        
+        precioLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
+        // Contenedor de cantidad con botones +/-
+        HBox cantidadBox = new HBox();
+        cantidadBox.setSpacing(10);
+        cantidadBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Button btnMenos = new Button("-");
+        btnMenos.getStyleClass().add("button-cantidad");
+        btnMenos.setPrefSize(35, 35);
+        btnMenos.setOnAction(event -> onRemoverProducto(producto));
+
+        Label cantidadLabel = new Label("0");
+        cantidadLabel.getStyleClass().add("producto-cantidad-display");
+        cantidadLabel.setId("cantidad-" + producto.getNombre().replace(" ", "_"));
+
+        Button btnMas = new Button("+");
+        btnMas.getStyleClass().add("button-cantidad");
+        btnMas.setPrefSize(35, 35);
+        btnMas.setOnAction(event -> onAgregarProducto(producto));
+
+        cantidadBox.getChildren().addAll(btnMenos, cantidadLabel, btnMas);
+
+        card.getChildren().addAll(iconoLabel, nombreLabel, precioLabel, cantidadBox);
+
         return card;
+    }
+
+    private String obtenerIconoProducto(String nombre) {
+        if (nombre.contains("Palomitas")) return "🍿";
+        if (nombre.contains("Refresco")) return "🥤";
+        if (nombre.contains("Nachos")) return "🧀";
+        if (nombre.contains("Hot Dog")) return "🌭";
+        if (nombre.contains("Agua")) return "💧";
+        if (nombre.contains("Chocolates")) return "🍫";
+        if (nombre.contains("Combo")) return "🎁";
+        return "🍴";
     }
     
     private void onAgregarProducto(ItemCompra producto) {
         int cantidad = cantidadesSeleccionadas.getOrDefault(producto, 0);
         cantidad++;
         cantidadesSeleccionadas.put(producto, cantidad);
-        
+
         // Agregar a sesión de compra
         for (int i = 0; i < 1; i++) {
             sesionCompra.agregarProducto(producto);
         }
-        
+
         actualizarResumen();
+        actualizarCantidadLabel(producto, cantidad);
     }
-    
+
     private void onRemoverProducto(ItemCompra producto) {
         int cantidad = cantidadesSeleccionadas.getOrDefault(producto, 0);
         if (cantidad > 0) {
@@ -148,10 +177,30 @@ public class ConfiteriaController implements Initializable {
             cantidadesSeleccionadas.put(producto, cantidad);
             sesionCompra.removerProducto(producto);
         }
-        
+
         actualizarResumen();
+        actualizarCantidadLabel(producto, cantidad);
     }
-    
+
+    private void actualizarCantidadLabel(ItemCompra producto, int cantidad) {
+        String id = "cantidad-" + producto.getNombre().replace(" ", "_");
+        for (javafx.scene.Node node : productosTilePane.getChildren()) {
+            if (node instanceof VBox) {
+                VBox card = (VBox) node;
+                for (javafx.scene.Node child : card.getChildren()) {
+                    if (child instanceof HBox) {
+                        HBox cantidadBox = (HBox) child;
+                        for (javafx.scene.Node labelNode : cantidadBox.getChildren()) {
+                            if (labelNode instanceof Label && labelNode.getId() != null && labelNode.getId().equals(id)) {
+                                ((Label) labelNode).setText(String.valueOf(cantidad));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void actualizarResumen() {
         List<String> nombres = new ArrayList<>();
         for (Map.Entry<ItemCompra, Integer> entry : cantidadesSeleccionadas.entrySet()) {
@@ -159,15 +208,15 @@ public class ConfiteriaController implements Initializable {
                 nombres.add(entry.getKey().getNombre() + " x" + entry.getValue());
             }
         }
-        
+
         if (nombres.isEmpty()) {
             productosSeleccionadosLabel.setText("Ningún producto seleccionado");
         } else {
             productosSeleccionadosLabel.setText("Productos: " + String.join(", ", nombres));
         }
-        
+
         totalLabel.setText(String.format("Total confitería: COP $%,.2f", sesionCompra.getPrecioProductos()));
-        
+
         btnContinuar.setDisable(false); // Se puede continuar sin productos
     }
     

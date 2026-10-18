@@ -6,9 +6,9 @@
 
 /* Header */
 .header {
-    -fx-background-color: #E8DFD0;
-    -fx-background-radius: 0 0 15 15;
-    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 10, 0, 0, 5);
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #E8DFD0, #DDD5C5);
+    -fx-background-radius: 0 0 20 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.25), 12, 0, 0, 6);
 }
 
 .title {
@@ -21,13 +21,55 @@
     -fx-font-size: 16px;
 }
 
-/* Contenedor de perfil de usuario */
-.perfil-container {
+/* Barra de búsqueda y filtros */
+.search-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+}
+
+.search-field {
     -fx-background-color: #FFFFFF;
-    -fx-background-radius: 10;
+    -fx-background-radius: 20;
     -fx-border-color: #D4C4A8;
     -fx-border-width: 2;
-    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 5, 0, 0, 2);
+    -fx-border-radius: 20;
+    -fx-padding: 8 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: #4A3F35;
+}
+
+.search-field:focused {
+    -fx-border-color: #C4A77D;
+    -fx-effect: dropshadow(three-pass-box, rgba(196, 167, 125, 0.3), 6, 0, 0, 3);
+}
+
+.filter-combo {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 20;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #4A3F35;
+}
+
+.filter-combo:focused {
+    -fx-border-color: #C4A77D;
+}
+
+.filter-label {
+    -fx-text-fill: #6B5B4F;
+    -fx-font-size: 14px;
+}
+
+/* Contenedor de perfil de usuario */
+.perfil-container {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
+    -fx-background-radius: 15;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 8, 0, 0, 4);
 }
 
 .perfil-nombre {
@@ -49,83 +91,350 @@
     -fx-font-weight: bold;
 }
 
+.counter-label {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 14px;
+}
+
 /* TilePane para películas */
 .tile-pane {
-    -fx-background-color: #E8DFD0;
-    -fx-padding: 20;
-    -fx-background-radius: 15;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
 /* Tarjeta de película */
 .pelicula-card {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 15;
-    -fx-padding: 20;
-    -fx-pref-width: 280;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
+    -fx-background-radius: 18;
+    -fx-padding: 25;
+    -fx-pref-width: 260;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 8, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.18), 10, 0, 0, 5);
     -fx-border-color: #D4C4A8;
     -fx-border-width: 2;
-    -fx-border-radius: 15;
+    -fx-border-radius: 18;
+    -fx-alignment: center;
 }
 
 .pelicula-card:hover {
-    -fx-background-color: #FAF8F5;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #F5F0E6);
     -fx-border-color: #C4A77D;
-    -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 12, 0, 0, 6);
+}
+
+.pelicula-icono {
+    -fx-font-size: 48px;
+    -fx-alignment: center;
 }
 
 .pelicula-titulo {
     -fx-text-fill: #4A3F35;
     -fx-font-weight: bold;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-wrap-text: true;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 
 .pelicula-genero {
     -fx-text-fill: #8B7355;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+    -fx-background-color: rgba(212, 196, 168, 0.3);
+    -fx-background-radius: 12;
+    -fx-padding: 4 12;
 }
 
 .pelicula-duracion {
     -fx-text-fill: #A89888;
     -fx-font-size: 13px;
+    -fx-alignment: center;
 }
 
 /* Footer */
 .footer {
-    -fx-background-color: #E8DFD0;
-    -fx-background-radius: 15 15 0 0;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #E8DFD0, #DDD5C5);
+    -fx-background-radius: 20 20 0 0;
+}
+
+.footer-text {
+    -fx-text-fill: #6B5B4F;
 }
 
 /* Botones */
 .button-primary {
-    -fx-background-color: #C4A77D;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #C4A77D, #B8976D);
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
-    -fx-background-radius: 8;
+    -fx-background-radius: 20;
     -fx-padding: 12 25;
     -fx-cursor: hand;
     -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 6, 0, 0, 3);
 }
 
 .button-primary:hover {
-    -fx-background-color: #B8976D;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #B8976D, #A8875D);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.4), 8, 0, 0, 4);
 }
 
 .button-secondary {
-    -fx-background-color: #D4C4A8;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #D4C4A8, #C8B898);
     -fx-text-fill: #4A3F35;
     -fx-font-weight: bold;
-    -fx-background-radius: 8;
+    -fx-background-radius: 20;
     -fx-padding: 12 25;
     -fx-cursor: hand;
     -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 6, 0, 0, 3);
 }
 
 .button-secondary:hover {
-    -fx-background-color: #C8B898;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #C8B898, #B8A888);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.25), 8, 0, 0, 4);
+}
+
+.button-admin {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #8B7355, #7B6345);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 6, 0, 0, 3);
+}
+
+.button-admin:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #7B6345, #6B5335);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.5), 8, 0, 0, 4);
+}
+
+/* Tarjetas de usuario en login */
+.usuario-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
+    -fx-background-radius: 18;
+    -fx-padding: 25;
+    -fx-pref-width: 240;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.18), 10, 0, 0, 5);
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 18;
+    -fx-alignment: center;
+}
+
+.usuario-card:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #F5F0E6);
+    -fx-border-color: #C4A77D;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 12, 0, 0, 6);
+}
+
+.usuario-card-selected {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #E8DFD0, #DDD5C5);
+    -fx-border-color: #8B7355;
+    -fx-border-width: 3;
+}
+
+.usuario-icono {
+    -fx-font-size: 48px;
+    -fx-alignment: center;
+}
+
+.usuario-nombre {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-wrap-text: true;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.usuario-rol {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+    -fx-background-color: rgba(212, 196, 168, 0.3);
+    -fx-background-radius: 12;
+    -fx-padding: 4 12;
+}
+
+.usuario-correo {
+    -fx-text-fill: #A89888;
+    -fx-font-size: 12px;
+    -fx-alignment: center;
+}
+
+/* Tarjetas de compra modernas */
+.compra-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
+    -fx-background-radius: 20;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 12, 0, 0, 6);
+}
+
+.compra-card:hover {
+    -fx-border-color: #C4A77D;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.25), 15, 0, 0, 8);
+}
+
+.descuentos-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #F5F0E6, #E8DFD0);
+}
+
+.total-card {
+    -fx-background-color: linear-gradient(135deg, #E8DFD0 0%, #D4C4A8 50%, #C4A77D 100%);
+    -fx-border-color: #8B7355;
+    -fx-border-width: 3;
+}
+
+.card-title {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.detalle-item {
+    -fx-padding: 8 0;
+}
+
+.detalle-label {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.detalle-valor {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.descuento-checkbox {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.descuento-checkbox .box {
+    -fx-background-color: #C4A77D;
+    -fx-border-color: #8B7355;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}
+
+.total-row {
+    -fx-padding: 8 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.total-row.final {
+    -fx-padding: 12 0 8 0;
+    -fx-border-color: #8B7355;
+    -fx-border-width: 0 0 1 0;
+}
+
+.total-label {
+    -fx-text-fill: #6B5B4F;
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.total-label.final {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.total-valor {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.total-valor.descuento {
+    -fx-text-fill: #2E7D32;
+}
+
+.total-valor.final {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Productos de confitería mejorados */
+.producto-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
+    -fx-background-radius: 18;
+    -fx-padding: 25;
+    -fx-pref-width: 220;
+    -fx-border-color: #D4C4A8;
+    -fx-border-width: 2;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.15), 8, 0, 0, 4);
+}
+
+.producto-card:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #F5F0E6);
+    -fx-border-color: #C4A77D;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.25), 10, 0, 0, 5);
+}
+
+.producto-icono {
+    -fx-font-size: 42px;
+    -fx-alignment: center;
+}
+
+.producto-nombre {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-wrap-text: true;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.producto-precio {
+    -fx-text-fill: #8B7355;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+}
+
+.button-cantidad {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #C4A77D, #B8976D);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 4, 0, 0, 2);
+}
+
+.button-cantidad:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #B8976D, #A8875D);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 6, 0, 0, 3);
+}
+
+.producto-cantidad-display {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-min-width: 30;
+    -fx-alignment: center;
 }
 
 /* Asientos */
@@ -213,24 +522,43 @@
 
 /* Tarjeta virtual */
 .tarjeta-card {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #E8DFD0, #D4C4A8);
+    -fx-background-color: linear-gradient(135deg, #E8DFD0 0%, #D4C4A8 50%, #C4A77D 100%);
     -fx-background-radius: 20;
-    -fx-padding: 40;
-    -fx-border-color: #C4A77D;
+    -fx-padding: 30;
+    -fx-border-color: #8B7355;
     -fx-border-width: 3;
     -fx-border-radius: 20;
-    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 10, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 15, 0, 0, 8);
 }
 
-.saldo-label {
+.tarjeta-codigo {
     -fx-text-fill: #4A3F35;
-    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI Mono", monospace;
+    -fx-letter-spacing: 2;
 }
 
-.saldo-valor {
+.tarjeta-nombre {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
+}
+
+.tarjeta-descuentos {
+    -fx-text-fill: #6B5B4F;
+    -fx-font-style: italic;
+}
+
+.tarjeta-saldo-texto {
+    -fx-text-fill: #4A3F35;
+}
+
+.tarjeta-saldo-valor {
     -fx-text-fill: #8B7355;
     -fx-font-weight: bold;
-    -fx-font-size: 36px;
+}
+
+.tarjeta-estado {
+    -fx-text-fill: #4A3F35;
+    -fx-font-weight: bold;
 }
 
 /* ScrollPane */

@@ -2,11 +2,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -19,9 +21,9 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="25" right="30" bottom="25" left="30"/>
             </padding>
-            <Label text="Iniciar Sesión" styleClass="title">
+            <Label text="🔐 Iniciar Sesión" styleClass="title">
                 <font>
                     <Font name="Segoe UI Bold" size="36"/>
                 </font>
@@ -35,51 +37,60 @@
     </top>
 
     <center>
-        <VBox spacing="30" alignment="CENTER" maxWidth="600">
-            <padding>
-                <Insets top="50" right="50" bottom="50" left="50"/>
-            </padding>
-            
-            <VBox spacing="15" styleClass="resumen-container" maxWidth="500">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="25" styleClass="content">
                 <padding>
-                    <Insets top="30" right="30" bottom="30" left="30"/>
+                    <Insets top="25" right="30" bottom="25" left="30"/>
                 </padding>
-
+                
                 <Label text="Selecciona tu usuario:" styleClass="section-title">
                     <font>
-                        <Font name="Segoe UI Bold" size="18"/>
+                        <Font name="Segoe UI Bold" size="20"/>
                     </font>
                 </Label>
+                
+                <TilePane fx:id="usuariosTilePane" 
+                          prefColumns="3" 
+                          hgap="20" 
+                          vgap="20"
+                          styleClass="tile-pane">
+                </TilePane>
+                
+                <VBox spacing="15" styleClass="resumen-container" maxWidth="500" alignment="CENTER">
+                    <padding>
+                        <Insets top="25" right="30" bottom="25" left="30"/>
+                    </padding>
 
-                <ComboBox fx:id="usuarioComboBox" prefWidth="400" prefHeight="40"/>
+                    <VBox spacing="10">
+                        <Label text="Contraseña:" styleClass="resumen-label">
+                            <font>
+                                <Font name="Segoe UI" size="14"/>
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="contrasenaField" prefWidth="400" prefHeight="40" promptText="Ingresa tu contraseña"/>
+                    </VBox>
 
-                <VBox spacing="10">
-                    <Label text="Contraseña:" styleClass="resumen-label">
+                    <Label fx:id="infoLabel" text="Selecciona un usuario para continuar" styleClass="resumen-label">
                         <font>
                             <Font name="Segoe UI" size="14"/>
                         </font>
                     </Label>
-                    <PasswordField fx:id="contrasenaField" prefWidth="400" prefHeight="40" promptText="Ingresa tu contraseña"/>
                 </VBox>
-
-                <Label fx:id="infoLabel" text="Selecciona un usuario para continuar" styleClass="resumen-label">
-                    <font>
-                        <Font name="Segoe UI" size="14"/>
-                    </font>
-                </Label>
             </VBox>
-        </VBox>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER" spacing="20" styleClass="footer">
+        <VBox styleClass="footer">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="20" right="30" bottom="20" left="30"/>
             </padding>
-            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
-            <Button fx:id="btnCrearUsuario" text="Crear Usuario" onAction="#onCrearUsuario" styleClass="button-secondary"/>
-            <Button fx:id="btnIniciarSesion" text="Iniciar Sesión" onAction="#onIniciarSesion" styleClass="button-primary"/>
-        </HBox>
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
+                <Button fx:id="btnCrearUsuario" text="Crear Usuario" onAction="#onCrearUsuario" styleClass="button-secondary"/>
+                <Button fx:id="btnIniciarSesion" text="Iniciar Sesión" onAction="#onIniciarSesion" styleClass="button-primary"/>
+            </HBox>
+        </VBox>
     </bottom>
 
 </BorderPane>

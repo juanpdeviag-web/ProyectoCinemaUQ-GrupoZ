@@ -17,6 +17,7 @@ public class TarjetaVirtual {
     final private LocalDateTime fechaCreacion;
     private LocalDateTime fechaUltimaActividad;
     private final List<Transaccion> historialTransacciones;
+    private final List<String> descuentos;
 
     public TarjetaVirtual() {
         this.saldo = 0.0;
@@ -25,6 +26,7 @@ public class TarjetaVirtual {
         this.fechaCreacion = LocalDateTime.now();
         this.fechaUltimaActividad = LocalDateTime.now();
         this.historialTransacciones = new ArrayList<>();
+        this.descuentos = new ArrayList<>();
     }
 
     public double getSaldo() { 
@@ -43,8 +45,16 @@ public class TarjetaVirtual {
         return fechaCreacion; 
     }
     
-    public LocalDateTime getFechaUltimaActividad() { 
-        return fechaUltimaActividad; 
+    public LocalDateTime getFechaUltimaActividad() {
+        return fechaUltimaActividad;
+    }
+
+    public List<String> getDescuentos() {
+        return descuentos;
+    }
+
+    public void agregarDescuento(String descuento) {
+        this.descuentos.add(descuento);
     }
 
     public void recargar(double monto) {
