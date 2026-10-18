@@ -49,6 +49,8 @@ public class Navegador {
                 ((co.edu.uq.cinemauq.ui.controllers.CompraController) controller).cargarDatos(sesionCompra);
             } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.TarjetaVirtualController) {
                 ((co.edu.uq.cinemauq.ui.controllers.TarjetaVirtualController) controller).cargarDatos(sesionCompra);
+            } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.TicketController) {
+                ((co.edu.uq.cinemauq.ui.controllers.TicketController) controller).cargarUltimaReserva();
             } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.AdminPanelController) {
                 ((co.edu.uq.cinemauq.ui.controllers.AdminPanelController) controller).cargarDatos(usuarioActual);
             }

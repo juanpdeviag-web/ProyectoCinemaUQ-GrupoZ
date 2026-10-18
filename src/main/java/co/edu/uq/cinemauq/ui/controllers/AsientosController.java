@@ -2,6 +2,7 @@ package co.edu.uq.cinemauq.ui.controllers;
 
 import co.edu.uq.cinemauq.core.domain.Funcion;
 import co.edu.uq.cinemauq.core.domain.Sala;
+import co.edu.uq.cinemauq.core.managers.AsientosManager;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
 import co.edu.uq.cinemauq.ui.utils.FuncionesGenerator;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
@@ -65,50 +66,33 @@ public class AsientosController implements Initializable {
      */
     public void cargarDatos(SesionCompra sesionCompra) {
         this.sesionCompra = sesionCompra;
-        
+
         if (sesionCompra == null || !sesionCompra.tieneFuncionSeleccionada()) {
             System.err.println("Error: No hay función seleccionada en la sesión");
             return;
         }
-        
+
         Funcion funcion = sesionCompra.getFuncionSeleccionada();
         this.sala = funcion.getSala();
         this.precioEntrada = sesionCompra.getPrecioEntrada();
-        
-        // Generar asientos ocupados aleatoriamente para simulación
-        this.asientosOcupados = generarAsientosOcupados(sala);
-        
+
+        // Obtener asientos ocupados del AsientosManager en lugar de generarlos aleatoriamente
+        String funcionId = funcion.getId();
+        this.asientosOcupados = AsientosManager.getInstance().getAsientosOcupados(funcionId);
+        System.out.println("Asientos ocupados para función " + funcionId + ": " + asientosOcupados);
+
         // Mostrar información de la función
         String fechaHora = FuncionesGenerator.formatearFechaHora(funcion.getFechaHora());
         funcionInfoLabel.setText(fechaHora + " - " + funcion.getPelicula().getTitulo());
         salaInfoLabel.setText("Sala " + sala.getNumero() + " - Capacidad: " + sala.calcularCapacidad() + " asientos");
-        
+
         // Renderizar grilla de asientos
         renderizarAsientos();
-        
+
         // Actualizar resumen
         actualizarResumen();
     }
-    
-    /**
-     * Genera asientos ocupados aleatoriamente para simulación.
-     * En un sistema real, esto vendría de una base de datos.
-     */
-    private Set<String> generarAsientosOcupados(Sala sala) {
-        Set<String> ocupados = new HashSet<>();
-        List<String> todosAsientos = FuncionesGenerator.generarIdsAsientos(sala);
-        
-        // Ocupar aproximadamente el 30% de los asientos
-        int cantidadOcupados = (int) (todosAsientos.size() * 0.3);
-        java.util.Collections.shuffle(todosAsientos);
-        
-        for (int i = 0; i < cantidadOcupados; i++) {
-            ocupados.add(todosAsientos.get(i));
-        }
-        
-        return ocupados;
-    }
-    
+
     /**
      * Renderiza la grilla de asientos en el GridPane.
      */

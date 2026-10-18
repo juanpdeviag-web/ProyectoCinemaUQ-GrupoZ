@@ -3,6 +3,7 @@ import co.edu.uq.cinemauq.core.exceptions.FuncionException;
 import co.edu.uq.cinemauq.core.exceptions.FuncionSuperpuestaException;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Representa una función de cine (proyección).
@@ -10,14 +11,20 @@ import java.time.LocalDateTime;
  */
 
 public class Funcion {
+    private final String id;
     private Pelicula pelicula;
     private Sala sala;
     private LocalDateTime fechaHora;
 
     public Funcion(Pelicula pelicula, Sala sala, LocalDateTime fechaHora) {
+        this.id = UUID.randomUUID().toString();
         this.pelicula = pelicula;
         this.sala = sala;
         this.fechaHora = fechaHora;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public Pelicula getPelicula() { return pelicula; }

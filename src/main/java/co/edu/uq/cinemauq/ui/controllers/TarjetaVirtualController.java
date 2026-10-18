@@ -1,11 +1,15 @@
 package co.edu.uq.cinemauq.ui.controllers;
 
 import co.edu.uq.cinemauq.core.domain.Cliente;
+import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
 import co.edu.uq.cinemauq.core.domain.TarjetaVirtual;
 import co.edu.uq.cinemauq.core.domain.Transaccion;
 import co.edu.uq.cinemauq.core.exceptions.SaldoInsuficienteException;
 import co.edu.uq.cinemauq.core.exceptions.TarjetaInactivaException;
+import co.edu.uq.cinemauq.core.managers.AsientosManager;
+import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
+import co.edu.uq.cinemauq.ui.utils.FuncionesGenerator;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,8 +20,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Controlador para la pantalla de tarjeta virtual.
@@ -39,7 +45,10 @@ public class TarjetaVirtualController implements Initializable {
 
     @FXML
     private Label estadoLabel;
-    
+
+    @FXML
+    private Label totalAPagarLabel;
+
     @FXML
     private TextField recargaTextField;
     
@@ -67,22 +76,34 @@ public class TarjetaVirtualController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("=== INICIALIZANDO TARJETA VIRTUAL ===");
         historialListView.setVisible(false);
     }
     
     public void cargarDatos(SesionCompra sesionCompra) {
         this.sesionCompra = sesionCompra;
 
+        System.out.println("=== CARGANDO TARJETA VIRTUAL ===");
+
         // Obtener el cliente actual del navegador
         this.cliente = (Cliente) Navegador.getUsuarioActual();
         if (this.cliente == null) {
+            System.err.println("❌ No hay usuario actual, creando cliente de prueba");
             // Crear un cliente de prueba con tarjeta virtual
             this.cliente = new Cliente("CLI001", "Usuario Prueba", "usuario@test.com");
+        } else {
+            System.out.println("✅ Usuario actual: " + cliente.getNombre());
         }
-        this.tarjeta = cliente.getTarjeta();
 
-        // Recargar saldo inicial para pruebas (COP)
-        tarjeta.recargar(100000.0); // $100,000 COP
+        this.tarjeta = cliente.getTarjeta();
+        System.out.println("💳 Tarjeta: " + tarjeta.getNumeroTarjeta());
+        System.out.println("💰 Saldo actual: $" + tarjeta.getSaldo());
+
+        // NO recargar automáticamente - el usuario debe hacerlo manualmente
+        // if (tarjeta.getSaldo() == 0.0) {
+        //     tarjeta.recargar(100000.0);
+        //     System.out.println("Saldo inicial recargado: $100,000 COP");
+        // }
 
         mostrarInformacionTarjeta();
     }
@@ -92,6 +113,15 @@ public class TarjetaVirtualController implements Initializable {
         nombreUsuarioLabel.setText("Titular: " + cliente.getNombre());
         descuentosLabel.setText("Descuentos: " + (cliente.getTarjeta().getDescuentos().isEmpty() ? "Ninguno" : String.join(", ", cliente.getTarjeta().getDescuentos())));
         saldoLabel.setText(String.format("$%,.0f", tarjeta.getSaldo()));
+
+        // Mostrar total a pagar de la sesión de compra
+        if (sesionCompra != null) {
+            double totalAPagar = sesionCompra.calcularTotal();
+            totalAPagarLabel.setText(String.format("COP $%,.0f", totalAPagar));
+            System.out.println("💵 Total a pagar: COP $" + totalAPagar);
+        } else {
+            totalAPagarLabel.setText("No hay compra pendiente");
+        }
 
         if (tarjeta.isActiva()) {
             estadoLabel.setText("✅ Activa");
@@ -126,24 +156,52 @@ public class TarjetaVirtualController implements Initializable {
     @FXML
     private void onPagar() {
         double totalCompra = sesionCompra.calcularTotal();
-        
+
+        System.out.println("=== PROCESANDO PAGO ===");
+        System.out.println("Saldo antes del pago: $" + tarjeta.getSaldo());
+        System.out.println("Monto a pagar: $" + totalCompra);
+
         try {
             if (tarjeta.validarSaldoSuficiente(totalCompra)) {
                 tarjeta.deducir(totalCompra);
                 mostrarInformacionTarjeta();
-                System.out.println("Pago exitoso de COP $" + totalCompra);
+                System.out.println("✅ Pago exitoso de COP $" + totalCompra);
+                System.out.println("Saldo después del pago: $" + tarjeta.getSaldo());
                 System.out.println(tarjeta.obtenerResumenTransacciones());
 
-                // Navegar a cartelera después del pago
+                // Marcar asientos como ocupados en el AsientosManager
+                if (sesionCompra.tieneFuncionSeleccionada() && !sesionCompra.getAsientosSeleccionados().isEmpty()) {
+                    String funcionId = sesionCompra.getFuncionSeleccionada().getId();
+                    Set<String> asientos = new HashSet<>(sesionCompra.getAsientosSeleccionados());
+                    AsientosManager.getInstance().marcarAsientosOcupados(funcionId, asientos);
+                    System.out.println("✅ Asientos marcados como ocupados: " + asientos);
+
+                    // Crear reservas para cada asiento comprado
+                    for (String asientoId : asientos) {
+                        ReservaAsiento reserva = new ReservaAsiento(
+                            cliente.getId(),
+                            cliente.getNombre(),
+                            funcionId,
+                            sesionCompra.getFuncionSeleccionada().getPelicula().getTitulo(),
+                            sesionCompra.getFuncionSeleccionada().getSala().getNumero(),
+                            sesionCompra.getFuncionSeleccionada().getFechaHora(),
+                            asientoId,
+                            totalCompra / asientos.size() // Dividir el total entre los asientos
+                        );
+                        ReservasManager.getInstance().agregarReserva(reserva);
+                    }
+                }
+
+                // Navegar a ticket después del pago
                 sesionCompra.limpiar();
-                Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+                Navegador.navegarA("/ui/views/ticket.fxml", "CinemaUQ - Ticket de Compra");
             } else {
-                System.err.println("Saldo insuficiente. Saldo actual: COP $" + tarjeta.getSaldo() + ", requerido: COP $" + totalCompra);
+                System.err.println("❌ Saldo insuficiente. Saldo actual: COP $" + tarjeta.getSaldo() + ", requerido: COP $" + totalCompra);
             }
         } catch (SaldoInsuficienteException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         } catch (TarjetaInactivaException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
     

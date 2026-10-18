@@ -60,7 +60,7 @@
                         <Insets top="20" right="25" bottom="20" left="25"/>
                     </padding>
                     <Label text="📋 Total a pagar:" styleClass="section-title"/>
-                    <Label text="El total se calculará del resumen de compra" styleClass="resumen-label"/>
+                    <Label fx:id="totalAPagarLabel" text="Calculando..." styleClass="resumen-label"/>
                 </VBox>
 
                 <ListView fx:id="historialListView" prefHeight="200" styleClass="historial-list"/>

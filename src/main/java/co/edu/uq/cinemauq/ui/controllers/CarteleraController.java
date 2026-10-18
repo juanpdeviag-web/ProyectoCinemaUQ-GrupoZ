@@ -4,6 +4,7 @@ import co.edu.uq.cinemauq.core.domain.Administrador;
 import co.edu.uq.cinemauq.core.domain.Cliente;
 import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.core.domain.Pelicula;
+import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.core.seed.DataSeeder;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
@@ -17,6 +18,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**

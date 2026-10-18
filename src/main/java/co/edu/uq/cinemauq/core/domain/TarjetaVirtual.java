@@ -58,6 +58,10 @@ public class TarjetaVirtual {
     }
 
     public void recargar(double monto) {
+        System.out.println("=== RECARGANDO TARJETA ===");
+        System.out.println("Saldo antes: $" + this.saldo);
+        System.out.println("Monto a recargar: $" + monto);
+
         if (!this.activa) {
             throw new TarjetaInactivaException("No se puede recargar a una tarjeta inactiva");
         }
@@ -67,6 +71,9 @@ public class TarjetaVirtual {
         double saldoAnterior = this.saldo;
         this.saldo += monto;
         actualizarActividad();
+
+        System.out.println("Saldo después: $" + this.saldo);
+
         Transaccion transaccion = new Transaccion(
             UUID.randomUUID().toString(),
             TipoTransaccion.RECARGA,

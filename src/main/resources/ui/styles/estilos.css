@@ -120,8 +120,12 @@
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #F5F0E6);
     -fx-border-color: #C4A77D;
     -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.3), 12, 0, 0, 6);
+}
+
+.pelicula-card-comprada {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #E8F5E9, #C8E6C9);
+    -fx-border-color: #4CAF50;
+    -fx-opacity: 0.8;
 }
 
 .pelicula-icono {
@@ -373,6 +377,84 @@
     -fx-font-weight: bold;
 }
 
+/* Estilos para Ticket de Compra */
+.ticket-card {
+    -fx-background-color: linear-gradient(135deg, #FFFFFF 0%, #FAF8F5 50%, #F5F0E6 100%);
+    -fx-background-radius: 25;
+    -fx-border-color: #C4A77D;
+    -fx-border-width: 3;
+    -fx-border-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(139, 115, 85, 0.2), 20, 0, 0, 10);
+}
+
+.ticket-cinema-name {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-letter-spacing: 3;
+}
+
+.ticket-pelicula {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.ticket-info-row {
+    -fx-padding: 10 0;
+}
+
+.ticket-info {
+    -fx-text-fill: #6B5B4F;
+    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.ticket-asientos-container {
+    -fx-padding: 15 0;
+    -fx-background-color: #E8DFD0;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+
+.ticket-section-title {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.ticket-asientos {
+    -fx-text-fill: #4A3F35;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Courier New", monospace;
+    -fx-letter-spacing: 5;
+}
+
+.ticket-total {
+    -fx-text-fill: #C4A77D;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.ticket-fecha-compra {
+    -fx-text-fill: #A89888;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-style: italic;
+}
+
+.ticket-instruccion {
+    -fx-text-fill: #8B7355;
+    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-style: italic;
+}
+
 /* Productos de confitería mejorados */
 .producto-card {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #FFFFFF, #FAF8F5);
@@ -467,11 +549,12 @@
 }
 
 .asiento-ocupado {
-    -fx-background-color: #D8D0C0;
-    -fx-text-fill: #A89888;
-    -fx-cursor: default;
-    -fx-border-color: #C8B898;
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: #424242;
+    -fx-cursor: not-allowed;
+    -fx-border-color: #616161;
     -fx-border-width: 2;
+    -fx-opacity: 0.5;
 }
 
 /* Productos de confitería */

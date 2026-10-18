@@ -35,23 +35,23 @@ public class UserSeeder {
 
         // Clientes de prueba
         Cliente cliente1 = new Cliente("CLI001", "Juan Pérez", "juan.perez@email.com");
-        cliente1.getTarjeta().recargar(50000.0); // $50,000 COP
+        // cliente1.getTarjeta().recargar(50000.0); // $50,000 COP - Saldo inicial eliminado
         usuarios.add(cliente1);
 
         Cliente cliente2 = new Cliente("CLI002", "María García", "maria.garcia@email.com");
-        cliente2.getTarjeta().recargar(75000.0); // $75,000 COP
+        // cliente2.getTarjeta().recargar(75000.0); // $75,000 COP - Saldo inicial eliminado
         usuarios.add(cliente2);
 
         Cliente cliente3 = new Cliente("CLI003", "Carlos Rodríguez", "carlos.rodriguez@email.com");
-        cliente3.getTarjeta().recargar(100000.0); // $100,000 COP
+        // cliente3.getTarjeta().recargar(100000.0); // $100,000 COP - Saldo inicial eliminado
         usuarios.add(cliente3);
 
         Cliente cliente4 = new Cliente("CLI004", "Ana Martínez", "ana.martinez@email.com");
-        cliente4.getTarjeta().recargar(40000.0); // $40,000 COP
+        // cliente4.getTarjeta().recargar(40000.0); // $40,000 COP - Saldo inicial eliminado
         usuarios.add(cliente4);
 
         Cliente cliente5 = new Cliente("CLI005", "Pedro López", "pedro.lopez@email.com");
-        cliente5.getTarjeta().recargar(60000.0); // $60,000 COP
+        // cliente5.getTarjeta().recargar(60000.0); // $60,000 COP - Saldo inicial eliminado
         usuarios.add(cliente5);
 
         // Administradores de prueba
