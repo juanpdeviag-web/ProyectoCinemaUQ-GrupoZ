@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.CompraController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="30" right="40" bottom="30" left="40"/>
+            </padding>
+            <Label text="📋 Resumen de Compra" styleClass="title"/>
+            <Label text="Revisa los detalles de tu compra antes de confirmar" styleClass="subtitle"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="30" styleClass="content">
+                <padding>
+                    <Insets top="30" right="40" bottom="30" left="40"/>
+                </padding>
+
+                <VBox fx:id="resumenContainer" spacing="18" styleClass="compra-card" maxWidth="600">
+                    <padding>
+                        <Insets top="25" right="30" bottom="25" left="30"/>
+                    </padding>
+                    <Label text="🎬 Detalles de la Compra" styleClass="card-title"/>
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Película" styleClass="detalle-label"/>
+                        <Label fx:id="peliculaLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Función" styleClass="detalle-label"/>
+                        <Label fx:id="funcionLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Asientos" styleClass="detalle-label"/>
+                        <Label fx:id="asientosLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Productos" styleClass="detalle-label"/>
+                        <Label fx:id="productosLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="15" styleClass="compra-card descuentos-card" maxWidth="600">
+                    <padding>
+                        <Insets top="25" right="30" bottom="25" left="30"/>
+                    </padding>
+                    <Label text="🎟️ Descuentos Disponibles" styleClass="card-title"/>
+                    <VBox spacing="10">
+                        <CheckBox fx:id="chkDescuentoFijo" text="Descuento fijo de $5,000 COP" styleClass="descuento-checkbox"/>
+                        <CheckBox fx:id="chkPromocion" text="Promoción estudiante (10%)" styleClass="descuento-checkbox"/>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="15" styleClass="compra-card total-card" maxWidth="600">
+                    <padding>
+                        <Insets top="25" right="30" bottom="25" left="30"/>
+                    </padding>
+                    <Label text="💰 Resumen de Pagos" styleClass="card-title"/>
+                    <HBox spacing="20" styleClass="total-row">
+                        <Label text="Subtotal:" styleClass="total-label"/>
+                        <Label fx:id="subtotalLabel" text="0.00" styleClass="total-valor"/>
+                    </HBox>
+                    <HBox spacing="20" styleClass="total-row">
+                        <Label text="Descuento:" styleClass="total-label"/>
+                        <Label fx:id="descuentoLabel" text="0.00" styleClass="total-valor descuento"/>
+                    </HBox>
+                    <HBox spacing="20" styleClass="total-row final">
+                        <Label text="Total:" styleClass="total-label final"/>
+                        <Label fx:id="totalLabel" text="0.00" styleClass="total-valor final"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <VBox styleClass="footer">
+            <padding>
+                <Insets top="25" right="40" bottom="25" left="40"/>
+            </padding>
+            <HBox alignment="CENTER" spacing="25">
+                <Button fx:id="btnVolver" text="← Volver" onAction="#onVolver" styleClass="button-secondary"/>
+                <Button fx:id="btnConfirmar" text="Confirmar Compra →" onAction="#onConfirmar" styleClass="button-primary" disable="true"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>

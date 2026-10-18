@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.CarteleraController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="25" right="30" bottom="25" left="30"/>
+            </padding>
+            
+            <!-- Header principal -->
+            <HBox alignment="CENTER" spacing="25">
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="20">
+                    <VBox spacing="8">
+                        <Label text="🎬 CinemaUQ" styleClass="title">
+                            <font>
+                                <Font name="Segoe UI Bold" size="36"/>
+                            </font>
+                        </Label>
+                        <Label text="Cartelera de Películas" styleClass="subtitle">
+                            <font>
+                                <Font name="Segoe UI" size="16"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+                
+                <HBox alignment="CENTER" spacing="15">
+                    <VBox spacing="5" styleClass="perfil-container">
+                        <padding>
+                            <Insets top="8" right="18" bottom="8" left="18"/>
+                        </padding>
+                        <Label fx:id="perfilNombreLabel" text="" styleClass="perfil-nombre">
+                            <font>
+                                <Font name="Segoe UI Bold" size="16"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="perfilRolLabel" text="" styleClass="perfil-rol">
+                            <font>
+                                <Font name="Segoe UI" size="13"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <Button fx:id="btnLogin" text="Log In" onAction="#onLogin" styleClass="button-primary" prefWidth="110" prefHeight="42"/>
+                    <Button fx:id="btnAdminPanel" text="Admin" onAction="#onAdminPanel" styleClass="button-admin" prefWidth="100" prefHeight="42" visible="false" managed="false"/>
+                </HBox>
+            </HBox>
+            
+            <!-- Barra de búsqueda y filtros -->
+            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="search-bar">
+                <padding>
+                    <Insets top="15" right="0" bottom="0" left="0"/>
+                </padding>
+                <TextField fx:id="searchField" promptText="🔍 Buscar película..." prefWidth="300" prefHeight="40" styleClass="search-field"/>
+                <ComboBox fx:id="filtroGenero" promptText="Todos los géneros" prefWidth="180" prefHeight="40" styleClass="filter-combo"/>
+                <Label text="Ordenar por:" styleClass="filter-label">
+                    <font>
+                        <Font name="Segoe UI" size="14"/>
+                    </font>
+                </Label>
+                <ComboBox fx:id="ordenarPor" promptText="Relevancia" prefWidth="150" prefHeight="40" styleClass="filter-combo"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="main-scroll">
+            <VBox spacing="25" styleClass="content">
+                <padding>
+                    <Insets top="25" right="30" bottom="25" left="30"/>
+                </padding>
+                
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Label text="🎥 Películas en Cartelera" styleClass="section-title">
+                        <font>
+                            <Font name="Segoe UI Bold" size="24"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="contadorPeliculas" text="(0 películas)" styleClass="counter-label">
+                        <font>
+                            <Font name="Segoe UI" size="14"/>
+                        </font>
+                    </Label>
+                </HBox>
+                
+                <TilePane fx:id="peliculasTilePane" 
+                          prefColumns="4" 
+                          hgap="25" 
+                          vgap="25"
+                          styleClass="tile-pane">
+                </TilePane>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <VBox styleClass="footer">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            <HBox alignment="CENTER" spacing="20">
+                <Label text="© 2024 CinemaUQ - Sistema de Gestión de Cine" styleClass="footer-text">
+                    <font>
+                        <Font name="Segoe UI" size="13"/>
+                    </font>
+                </Label>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button text="Salir" onAction="#onSalir" styleClass="button-secondary" prefWidth="100" prefHeight="38"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>
