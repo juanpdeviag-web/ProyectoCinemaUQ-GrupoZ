@@ -21,69 +21,94 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="25" right="30" bottom="25" left="30"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <Label text="🔐 Iniciar Sesión" styleClass="title">
                 <font>
-                    <Font name="Segoe UI Bold" size="36"/>
+                    <Font name="Segoe UI Bold" size="28"/>
                 </font>
             </Label>
             <Label text="Selecciona tu usuario para continuar" styleClass="subtitle">
                 <font>
-                    <Font name="Segoe UI" size="18"/>
+                    <Font name="Segoe UI" size="14"/>
                 </font>
             </Label>
         </VBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
-            <VBox spacing="25" styleClass="content">
-                <padding>
-                    <Insets top="25" right="30" bottom="25" left="30"/>
-                </padding>
-                
-                <Label text="Selecciona tu usuario:" styleClass="section-title">
-                    <font>
-                        <Font name="Segoe UI Bold" size="20"/>
-                    </font>
-                </Label>
-                
-                <TilePane fx:id="usuariosTilePane" 
-                          prefColumns="3" 
-                          hgap="20" 
-                          vgap="20"
-                          styleClass="tile-pane">
-                </TilePane>
-                
-                <VBox spacing="15" styleClass="resumen-container" maxWidth="500" alignment="CENTER">
+        <HBox spacing="20">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" HBox.hgrow="ALWAYS">
+                <VBox spacing="25" styleClass="content">
                     <padding>
-                        <Insets top="25" right="30" bottom="25" left="30"/>
+                        <Insets top="25" right="20" bottom="25" left="20"/>
                     </padding>
 
-                    <VBox spacing="10">
-                        <Label text="Contraseña:" styleClass="resumen-label">
+                    <Label text="Selecciona tu usuario:" styleClass="section-title">
+                        <font>
+                            <Font name="Segoe UI Bold" size="20"/>
+                        </font>
+                    </Label>
+
+                    <TilePane fx:id="usuariosTilePane"
+                              prefColumns="3"
+                              hgap="20"
+                              vgap="20"
+                              styleClass="tile-pane">
+                    </TilePane>
+
+                    <VBox spacing="15" styleClass="resumen-container" maxWidth="500" alignment="CENTER">
+                        <padding>
+                            <Insets top="25" right="30" bottom="25" left="30"/>
+                        </padding>
+
+                        <VBox spacing="10">
+                            <Label text="Contraseña:" styleClass="resumen-label">
+                                <font>
+                                    <Font name="Segoe UI" size="14"/>
+                                </font>
+                            </Label>
+                            <PasswordField fx:id="contrasenaField" prefWidth="400" prefHeight="40" promptText="Ingresa tu contraseña"/>
+                        </VBox>
+
+                        <Label fx:id="infoLabel" text="Selecciona un usuario para continuar" styleClass="resumen-label">
                             <font>
                                 <Font name="Segoe UI" size="14"/>
                             </font>
                         </Label>
-                        <PasswordField fx:id="contrasenaField" prefWidth="400" prefHeight="40" promptText="Ingresa tu contraseña"/>
                     </VBox>
-
-                    <Label fx:id="infoLabel" text="Selecciona un usuario para continuar" styleClass="resumen-label">
-                        <font>
-                            <Font name="Segoe UI" size="14"/>
-                        </font>
-                    </Label>
                 </VBox>
+            </ScrollPane>
+
+            <VBox spacing="10" styleClass="resumen-container" prefWidth="280">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+
+                <Label text="🔐 Contraseñas de Prueba" styleClass="section-title">
+                    <font>
+                        <Font name="Segoe UI Bold" size="16"/>
+                    </font>
+                </Label>
+
+                <Label text="(Solo para demostración)" styleClass="resumen-label" wrapText="true">
+                    <font>
+                        <Font name="Segoe UI" size="11"/>
+                    </font>
+                </Label>
+
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                    <VBox fx:id="contrasenasContainer" spacing="8">
+                    </VBox>
+                </ScrollPane>
             </VBox>
-        </ScrollPane>
+        </HBox>
     </center>
 
     <bottom>
         <VBox styleClass="footer">
             <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <HBox alignment="CENTER" spacing="20">
                 <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>

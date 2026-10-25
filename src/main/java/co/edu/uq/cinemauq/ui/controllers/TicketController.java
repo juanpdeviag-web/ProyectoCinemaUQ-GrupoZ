@@ -1,13 +1,17 @@
 package co.edu.uq.cinemauq.ui.controllers;
 
 import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
+import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.ui.utils.FuncionesGenerator;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -48,11 +52,24 @@ public class TicketController implements Initializable {
     @FXML
     private Button btnVolver;
 
+    @FXML
+    private Button btnSalir;
+
+    @FXML
+    private VBox perfilContainer;
+
+    @FXML
+    private Label perfilNombreLabel;
+
+    @FXML
+    private Label perfilRolLabel;
+
     private List<ReservaAsiento> reservas;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // La inicialización se completa en cargarDatos()
+        cargarUltimaReserva();
+        configurarMenuPerfil();
     }
 
     /**
@@ -103,6 +120,17 @@ public class TicketController implements Initializable {
         ReservaAsiento ultimaReserva = reservas.get(reservas.size() - 1);
         DateTimeFormatter compraFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
         fechaCompraLabel.setText("Compra realizada: " + ultimaReserva.getFechaCompra().format(compraFormatter));
+
+        // Actualizar header
+        Usuario usuarioActual = Navegador.getUsuarioActual();
+        if (usuarioActual != null) {
+            perfilNombreLabel.setText(usuarioActual.getNombre());
+            if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Administrador) {
+                perfilRolLabel.setText("Rol: Administrador");
+            } else {
+                perfilRolLabel.setText("Rol: Cliente");
+            }
+        }
     }
 
     /**
@@ -133,6 +161,56 @@ public class TicketController implements Initializable {
 
     @FXML
     private void onVolver() {
+        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+    }
+
+    @FXML
+    private void onSalir() {
+        System.exit(0);
+    }
+
+    private void configurarMenuPerfil() {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
+        miCuentaItem.setOnAction(event -> onMiCuenta());
+
+        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
+        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
+
+        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
+        misTicketsItem.setOnAction(event -> onMisTickets());
+
+        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
+        carteleraItem.setOnAction(event -> onIrACartelera());
+
+        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
+
+        perfilContainer.setOnMouseClicked(event -> {
+            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
+        });
+    }
+
+    @FXML
+    private void onMiCuenta() {
+        Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
+    }
+
+    @FXML
+    private void onTarjetaVirtual() {
+        Usuario usuarioActual = Navegador.getUsuarioActual();
+        if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Cliente) {
+            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
+        }
+    }
+
+    @FXML
+    private void onMisTickets() {
+        Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
+    }
+
+    @FXML
+    private void onIrACartelera() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
 }

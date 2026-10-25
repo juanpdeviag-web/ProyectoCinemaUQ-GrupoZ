@@ -19,16 +19,16 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="25" right="30" bottom="25" left="30"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <Label text="🍿 Confitería" styleClass="title">
                 <font>
-                    <Font name="Segoe UI Bold" size="36"/>
+                    <Font name="Segoe UI Bold" size="28"/>
                 </font>
             </Label>
             <Label text="Selecciona tus productos y combos" styleClass="subtitle">
                 <font>
-                    <Font name="Segoe UI" size="18"/>
+                    <Font name="Segoe UI" size="14"/>
                 </font>
             </Label>
         </VBox>
@@ -38,12 +38,12 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
             <VBox spacing="25" styleClass="content">
                 <padding>
-                    <Insets top="25" right="30" bottom="25" left="30"/>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
                 
                 <Label text="🥤 Productos y Combos:" styleClass="section-title">
                     <font>
-                        <Font name="Segoe UI Bold" size="20"/>
+                        <Font name="Segoe UI Bold" size="18"/>
                     </font>
                 </Label>
                 
