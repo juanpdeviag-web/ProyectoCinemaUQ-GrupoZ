@@ -8,5 +8,6 @@ module co.edu.uq.cinemauq {
     requires org.junit.jupiter.api;
 
     opens co.edu.uq.cinemauq to javafx.fxml;
+    opens co.edu.uq.cinemauq.ui.controllers to javafx.fxml;
     exports co.edu.uq.cinemauq;
 }
