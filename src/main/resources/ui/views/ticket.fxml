@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.TicketController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="30" right="40" bottom="30" left="40"/>
+            </padding>
+            <Label text="🎟️ Ticket de Compra" styleClass="title"/>
+            <Label text="¡Disfruta tu película!" styleClass="subtitle"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="30" styleClass="content" alignment="CENTER">
+            <padding>
+                <Insets top="40" right="40" bottom="40" left="40"/>
+            </padding>
+
+            <VBox spacing="20" styleClass="ticket-card" maxWidth="500" alignment="CENTER">
+                <padding>
+                    <Insets top="30" right="30" bottom="30" left="30"/>
+                </padding>
+
+                <Label text="CINEMA UQ" styleClass="ticket-cinema-name"/>
+                <Label fx:id="peliculaLabel" text="Película: -" styleClass="ticket-pelicula"/>
+                <VBox spacing="8" styleClass="ticket-info-row">
+                    <Label fx:id="fechaLabel" text="Fecha: -" styleClass="ticket-info"/>
+                    <Label fx:id="horaLabel" text="Hora: -" styleClass="ticket-info"/>
+                    <Label fx:id="salaLabel" text="Sala: -" styleClass="ticket-info"/>
+                </VBox>
+
+                <VBox spacing="10" styleClass="ticket-asientos-container">
+                    <Label text="Asientos:" styleClass="ticket-section-title"/>
+                    <Label fx:id="asientosLabel" text="-" styleClass="ticket-asientos"/>
+                </VBox>
+
+                <VBox spacing="8" styleClass="ticket-info-row">
+                    <Label fx:id="usuarioLabel" text="Cliente: -" styleClass="ticket-info"/>
+                    <Label fx:id="totalLabel" text="Total: -" styleClass="ticket-total"/>
+                </VBox>
+
+                <Label fx:id="fechaCompraLabel" text="Compra realizada: -" styleClass="ticket-fecha-compra"/>
+            </VBox>
+
+            <Label text="🎬 Presenta este ticket al ingresar a la sala" styleClass="ticket-instruccion"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <VBox styleClass="footer">
+            <padding>
+                <Insets top="25" right="40" bottom="25" left="40"/>
+            </padding>
+            <HBox alignment="CENTER" spacing="25">
+                <Button fx:id="btnVolver" text="← Volver a Cartelera" onAction="#onVolver" styleClass="button-primary"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>
