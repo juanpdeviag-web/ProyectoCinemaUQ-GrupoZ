@@ -11,7 +11,9 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -46,6 +48,9 @@ public class CarteleraController {
     private Button btnAdminPanel;
 
     @FXML
+    private VBox perfilContainer;
+
+    @FXML
     private TextField searchField;
 
     @FXML
@@ -69,6 +74,32 @@ public class CarteleraController {
         actualizarPerfil();
         inicializarFiltros();
         configurarListeners();
+        configurarMenuPerfil();
+    }
+
+    /**
+     * Configura el menú contextual del perfil de usuario.
+     */
+    private void configurarMenuPerfil() {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
+        miCuentaItem.setOnAction(event -> onMiCuenta());
+
+        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
+        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
+
+        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
+        misTicketsItem.setOnAction(event -> onMisTickets());
+
+        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
+        carteleraItem.setOnAction(event -> onIrACartelera());
+
+        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
+
+        perfilContainer.setOnMouseClicked(event -> {
+            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
+        });
     }
 
     /**
@@ -298,10 +329,53 @@ public class CarteleraController {
         Usuario usuarioActual = Navegador.getUsuarioActual();
 
         if (usuarioActual instanceof Administrador) {
-            Navegador.navegarA("/ui/views/adminPanel.fxml", "CinemaUQ - Panel de Administrador");
+            Navegador.navegarA("/ui/views/admin_panel.fxml", "CinemaUQ - Panel de Administrador");
         } else {
             System.out.println("Acceso denegado: Solo administradores pueden acceder al panel.");
         }
+    }
+
+    /**
+     * Maneja la opción "Mi Cuenta" del menú del perfil.
+     */
+    @FXML
+    private void onMiCuenta() {
+        Usuario usuarioActual = Navegador.getUsuarioActual();
+        if (usuarioActual != null) {
+            Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
+        }
+    }
+
+    /**
+     * Maneja la opción "Tarjeta Virtual" del menú del perfil.
+     */
+    @FXML
+    private void onTarjetaVirtual() {
+        Usuario usuarioActual = Navegador.getUsuarioActual();
+        if (usuarioActual instanceof Cliente) {
+            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
+        } else {
+            System.out.println("Solo los clientes tienen tarjeta virtual.");
+        }
+    }
+
+    /**
+     * Maneja la opción "Mis Tickets" del menú del perfil.
+     */
+    @FXML
+    private void onMisTickets() {
+        Usuario usuarioActual = Navegador.getUsuarioActual();
+        if (usuarioActual != null) {
+            Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
+        }
+    }
+
+    /**
+     * Maneja la opción "Ir a Cartelera" del menú del perfil.
+     */
+    @FXML
+    private void onIrACartelera() {
+        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
 
     /**

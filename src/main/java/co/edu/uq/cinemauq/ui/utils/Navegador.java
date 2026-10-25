@@ -1,5 +1,6 @@
 package co.edu.uq.cinemauq.ui.utils;
 
+import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
 import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
 import javafx.fxml.FXMLLoader;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Utilidad para manejar la navegación entre pantallas en JavaFX.
@@ -18,6 +20,7 @@ public class Navegador {
     private static Stage primaryStage;
     private static SesionCompra sesionCompra;
     private static Usuario usuarioActual;
+    private static List<ReservaAsiento> reservasSeleccionadas;
 
     /**
      * Inicializa el navegador con el Stage principal y la sesión de compra.
@@ -50,7 +53,12 @@ public class Navegador {
             } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.TarjetaVirtualController) {
                 ((co.edu.uq.cinemauq.ui.controllers.TarjetaVirtualController) controller).cargarDatos(sesionCompra);
             } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.TicketController) {
-                ((co.edu.uq.cinemauq.ui.controllers.TicketController) controller).cargarUltimaReserva();
+                if (reservasSeleccionadas != null && !reservasSeleccionadas.isEmpty()) {
+                    ((co.edu.uq.cinemauq.ui.controllers.TicketController) controller).cargarDatos(reservasSeleccionadas);
+                    reservasSeleccionadas = null; // Limpiar después de usar
+                } else {
+                    ((co.edu.uq.cinemauq.ui.controllers.TicketController) controller).cargarUltimaReserva();
+                }
             } else if (controller instanceof co.edu.uq.cinemauq.ui.controllers.AdminPanelController) {
                 ((co.edu.uq.cinemauq.ui.controllers.AdminPanelController) controller).cargarDatos(usuarioActual);
             }
@@ -99,5 +107,19 @@ public class Navegador {
     public static void cerrarSesion() {
         usuarioActual = null;
         navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+    }
+
+    /**
+     * Establece las reservas seleccionadas para mostrar en el ticket.
+     */
+    public static void setReservasSeleccionadas(List<ReservaAsiento> reservas) {
+        reservasSeleccionadas = reservas;
+    }
+
+    /**
+     * Obtiene las reservas seleccionadas.
+     */
+    public static List<ReservaAsiento> getReservasSeleccionadas() {
+        return reservasSeleccionadas;
     }
 }

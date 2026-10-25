@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.MiCuentaController"
+            stylesheets="@../styles/estilos.css"
+            styleClass="root">
+
+    <top>
+        <VBox styleClass="header">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <HBox alignment="CENTER" spacing="20">
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                    <Label text="👤 Mi Cuenta" styleClass="title">
+                        <font>
+                            <Font name="Segoe UI Bold" size="28"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER" spacing="12">
+                    <VBox fx:id="perfilContainer" spacing="4" styleClass="perfil-container" style="-fx-cursor: hand;">
+                        <padding>
+                            <Insets top="6" right="15" bottom="6" left="15"/>
+                        </padding>
+                        <Label fx:id="perfilNombreLabel" text="" styleClass="perfil-nombre">
+                            <font>
+                                <Font name="Segoe UI Bold" size="14"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="perfilRolLabel" text="" styleClass="perfil-rol">
+                            <font>
+                                <Font name="Segoe UI" size="12"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <Button fx:id="btnSalir" text="Salir" onAction="#onSalir" styleClass="button-secondary" prefWidth="85" prefHeight="36"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox spacing="25" styleClass="content" alignment="CENTER">
+                <padding>
+                    <Insets top="30" right="30" bottom="30" left="30"/>
+                </padding>
+
+                <VBox spacing="20" styleClass="resumen-container" maxWidth="500" alignment="CENTER">
+                    <padding>
+                        <Insets top="30" right="30" bottom="30" left="30"/>
+                    </padding>
+
+                    <Label text="Información Personal" styleClass="card-title">
+                        <font>
+                            <Font name="Segoe UI Bold" size="20"/>
+                        </font>
+                    </Label>
+
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="ID:" styleClass="detalle-label"/>
+                        <Label fx:id="idLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Nombre:" styleClass="detalle-label"/>
+                        <Label fx:id="nombreLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Email:" styleClass="detalle-label"/>
+                        <Label fx:id="emailLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+
+                    <VBox spacing="12" styleClass="detalle-item">
+                        <Label text="Rol:" styleClass="detalle-label"/>
+                        <Label fx:id="rolLabel" text="-" styleClass="detalle-valor"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="saldoContainer" spacing="20" styleClass="resumen-container" maxWidth="500" alignment="CENTER" visible="false" managed="false">
+                    <padding>
+                        <Insets top="30" right="30" bottom="30" left="30"/>
+                    </padding>
+
+                    <Label text="Saldo de Tarjeta" styleClass="card-title">
+                        <font>
+                            <Font name="Segoe UI Bold" size="20"/>
+                        </font>
+                    </Label>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <Label text="Saldo actual:" styleClass="detalle-label"/>
+                        <Label fx:id="saldoLabel" text="-" styleClass="total-valor"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" styleClass="footer">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

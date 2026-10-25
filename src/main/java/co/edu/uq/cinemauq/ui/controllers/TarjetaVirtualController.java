@@ -4,6 +4,7 @@ import co.edu.uq.cinemauq.core.domain.Cliente;
 import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
 import co.edu.uq.cinemauq.core.domain.TarjetaVirtual;
 import co.edu.uq.cinemauq.core.domain.Transaccion;
+import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.core.exceptions.SaldoInsuficienteException;
 import co.edu.uq.cinemauq.core.exceptions.TarjetaInactivaException;
 import co.edu.uq.cinemauq.core.managers.AsientosManager;
@@ -14,8 +15,10 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
@@ -50,6 +53,9 @@ public class TarjetaVirtualController implements Initializable {
     private Label totalAPagarLabel;
 
     @FXML
+    private Label mensajeLabel;
+
+    @FXML
     private TextField recargaTextField;
     
     @FXML
@@ -69,6 +75,18 @@ public class TarjetaVirtualController implements Initializable {
     
     @FXML
     private ListView<String> historialListView;
+
+    @FXML
+    private VBox perfilContainer;
+
+    @FXML
+    private Label perfilNombreLabel;
+
+    @FXML
+    private Label perfilRolLabel;
+
+    @FXML
+    private Button btnSalir;
     
     private SesionCompra sesionCompra;
     private Cliente cliente;
@@ -78,6 +96,7 @@ public class TarjetaVirtualController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("=== INICIALIZANDO TARJETA VIRTUAL ===");
         historialListView.setVisible(false);
+        configurarMenuPerfil();
     }
     
     public void cargarDatos(SesionCompra sesionCompra) {
@@ -98,6 +117,10 @@ public class TarjetaVirtualController implements Initializable {
         this.tarjeta = cliente.getTarjeta();
         System.out.println("💳 Tarjeta: " + tarjeta.getNumeroTarjeta());
         System.out.println("💰 Saldo actual: $" + tarjeta.getSaldo());
+
+        // Actualizar header
+        perfilNombreLabel.setText(cliente.getNombre());
+        perfilRolLabel.setText("Rol: Cliente");
 
         // NO recargar automáticamente - el usuario debe hacerlo manualmente
         // if (tarjeta.getSaldo() == 0.0) {
@@ -161,6 +184,9 @@ public class TarjetaVirtualController implements Initializable {
         System.out.println("Saldo antes del pago: $" + tarjeta.getSaldo());
         System.out.println("Monto a pagar: $" + totalCompra);
 
+        // Ocultar mensaje anterior
+        mensajeLabel.setVisible(false);
+
         try {
             if (tarjeta.validarSaldoSuficiente(totalCompra)) {
                 tarjeta.deducir(totalCompra);
@@ -196,12 +222,25 @@ public class TarjetaVirtualController implements Initializable {
                 sesionCompra.limpiar();
                 Navegador.navegarA("/ui/views/ticket.fxml", "CinemaUQ - Ticket de Compra");
             } else {
-                System.err.println("❌ Saldo insuficiente. Saldo actual: COP $" + tarjeta.getSaldo() + ", requerido: COP $" + totalCompra);
+                String mensaje = "❌ Saldo insuficiente. Saldo actual: COP $" + String.format("%,.0f", tarjeta.getSaldo()) + 
+                                 ", requerido: COP $" + String.format("%,.0f", totalCompra);
+                System.err.println(mensaje);
+                mensajeLabel.setText(mensaje);
+                mensajeLabel.setStyle("-fx-text-fill: #e94560;");
+                mensajeLabel.setVisible(true);
             }
         } catch (SaldoInsuficienteException e) {
-            System.err.println("❌ Error: " + e.getMessage());
+            String mensaje = "❌ " + e.getMessage();
+            System.err.println(mensaje);
+            mensajeLabel.setText(mensaje);
+            mensajeLabel.setStyle("-fx-text-fill: #e94560;");
+            mensajeLabel.setVisible(true);
         } catch (TarjetaInactivaException e) {
-            System.err.println("❌ Error: " + e.getMessage());
+            String mensaje = "❌ " + e.getMessage();
+            System.err.println(mensaje);
+            mensajeLabel.setText(mensaje);
+            mensajeLabel.setStyle("-fx-text-fill: #e94560;");
+            mensajeLabel.setVisible(true);
         }
     }
     
@@ -229,6 +268,53 @@ public class TarjetaVirtualController implements Initializable {
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/compra.fxml", "CinemaUQ - Resumen de Compra");
+    }
+
+    @FXML
+    private void onSalir() {
+        System.exit(0);
+    }
+
+    private void configurarMenuPerfil() {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
+        miCuentaItem.setOnAction(event -> onMiCuenta());
+
+        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
+        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
+
+        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
+        misTicketsItem.setOnAction(event -> onMisTickets());
+
+        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
+        carteleraItem.setOnAction(event -> onIrACartelera());
+
+        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
+
+        perfilContainer.setOnMouseClicked(event -> {
+            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
+        });
+    }
+
+    @FXML
+    private void onMiCuenta() {
+        Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
+    }
+
+    @FXML
+    private void onTarjetaVirtual() {
+        // Ya estamos en Tarjeta Virtual
+    }
+
+    @FXML
+    private void onMisTickets() {
+        Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
+    }
+
+    @FXML
+    private void onIrACartelera() {
+        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
     
     public SesionCompra getSesionCompra() {

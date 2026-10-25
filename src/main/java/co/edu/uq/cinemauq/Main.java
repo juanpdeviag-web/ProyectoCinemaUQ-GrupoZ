@@ -15,9 +15,16 @@ public class Main extends Application {
         // Inicializar el navegador con el Stage y la sesión
         Navegador.inicializar(primaryStage, sesionCompra);
 
-        // Configurar el Stage con resolución 1920x1080
+        // Configurar el Stage
         primaryStage.setTitle("CinemaUQ - Gestión de Cine");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
+        
+        // Configurar tamaño por defecto para modo ventana (80% de pantalla)
+        primaryStage.setWidth(1280);
+        primaryStage.setHeight(720);
+        
+        // Iniciar en modo maximizado
+        primaryStage.setMaximized(true);
 
         // Navegar a la pantalla inicial (cartelera)
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");

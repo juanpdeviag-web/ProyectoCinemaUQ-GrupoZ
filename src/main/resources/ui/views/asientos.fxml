@@ -19,21 +19,21 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <Label text="Selección de Asientos" styleClass="title">
                 <font>
-                    <Font name="Arial Bold" size="32"/>
+                    <Font name="Arial Bold" size="26"/>
                 </font>
             </Label>
             <Label fx:id="funcionInfoLabel" text="Información de función" styleClass="subtitle">
                 <font>
-                    <Font name="Arial" size="16"/>
+                    <Font name="Arial" size="14"/>
                 </font>
             </Label>
             <Label fx:id="salaInfoLabel" text="Información de sala" styleClass="subtitle">
                 <font>
-                    <Font name="Arial" size="14"/>
+                    <Font name="Arial" size="12"/>
                 </font>
             </Label>
         </VBox>

@@ -18,16 +18,16 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <Label fx:id="peliculaTituloLabel" text="Película" styleClass="title">
                 <font>
-                    <Font name="Arial Bold" size="32"/>
+                    <Font name="Arial Bold" size="26"/>
                 </font>
             </Label>
             <Label fx:id="peliculaInfoLabel" text="Información" styleClass="subtitle">
                 <font>
-                    <Font name="Arial" size="18"/>
+                    <Font name="Arial" size="14"/>
                 </font>
             </Label>
         </VBox>
@@ -42,7 +42,7 @@
 
                 <Label text="Funciones disponibles:" styleClass="section-title">
                     <font>
-                        <Font name="Arial Bold" size="20"/>
+                        <Font name="Arial Bold" size="18"/>
                     </font>
                 </Label>
 

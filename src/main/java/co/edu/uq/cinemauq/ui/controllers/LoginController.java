@@ -41,6 +41,9 @@ public class LoginController implements Initializable {
     @FXML
     private Button btnVolver;
 
+    @FXML
+    private VBox contrasenasContainer;
+
     private Usuario usuarioSeleccionado;
 
     @Override
@@ -50,11 +53,34 @@ public class LoginController implements Initializable {
 
     private void cargarUsuarios() {
         List<Usuario> usuarios = UserSeeder.cargarUsuarios();
-        
+
         for (Usuario usuario : usuarios) {
             VBox usuarioCard = crearTarjetaUsuario(usuario);
             usuariosTilePane.getChildren().add(usuarioCard);
+
+            // Agregar entrada de contraseña al panel de contraseñas
+            VBox contrasenaEntry = crearEntradaContrasena(usuario);
+            contrasenasContainer.getChildren().add(contrasenaEntry);
         }
+    }
+
+    private VBox crearEntradaContrasena(Usuario usuario) {
+        VBox entry = new VBox();
+        entry.setSpacing(4);
+        entry.setStyle("-fx-background-color: #FAF8F5; -fx-background-radius: 8; -fx-padding: 8;");
+
+        Label nombreLabel = new Label(usuario.getNombre());
+        nombreLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #4A3F35;");
+        nombreLabel.setWrapText(true);
+
+        Label idLabel = new Label(usuario.getId());
+        idLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #8B7355;");
+
+        Label contrasenaLabel = new Label("Pass: " + UserSeeder.getContrasena(usuario.getId()));
+        contrasenaLabel.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-text-fill: #C4A77D; -fx-font-weight: bold;");
+
+        entry.getChildren().addAll(nombreLabel, idLabel, contrasenaLabel);
+        return entry;
     }
 
     private VBox crearTarjetaUsuario(Usuario usuario) {

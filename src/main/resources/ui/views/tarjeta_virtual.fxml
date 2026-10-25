@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -19,10 +20,32 @@
     <top>
         <VBox styleClass="header">
             <padding>
-                <Insets top="25" right="30" bottom="25" left="30"/>
+                <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
-            <Label text="💳 Tarjeta Virtual" styleClass="title"/>
-            <Label text="Gestiona tu saldo y realiza pagos" styleClass="subtitle"/>
+            <HBox alignment="CENTER" spacing="20">
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                    <Label text="💳 Tarjeta Virtual" styleClass="title"/>
+                    <Label text="Gestiona tu saldo y realiza pagos" styleClass="subtitle"/>
+                </HBox>
+                <HBox alignment="CENTER" spacing="12">
+                    <VBox fx:id="perfilContainer" spacing="4" styleClass="perfil-container" style="-fx-cursor: hand;">
+                        <padding>
+                            <Insets top="6" right="15" bottom="6" left="15"/>
+                        </padding>
+                        <Label fx:id="perfilNombreLabel" text="" styleClass="perfil-nombre">
+                            <font>
+                                <Font name="Segoe UI Bold" size="14"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="perfilRolLabel" text="" styleClass="perfil-rol">
+                            <font>
+                                <Font name="Segoe UI" size="12"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                    <Button fx:id="btnSalir" text="Salir" onAction="#onSalir" styleClass="button-secondary" prefWidth="85" prefHeight="36"/>
+                </HBox>
+            </HBox>
         </VBox>
     </top>
 
@@ -30,7 +53,7 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
             <VBox spacing="25" styleClass="content" alignment="CENTER">
                 <padding>
-                    <Insets top="25" right="30" bottom="25" left="30"/>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
                 <VBox fx:id="tarjetaCard" spacing="12" styleClass="tarjeta-card" maxWidth="450" alignment="CENTER">
@@ -61,6 +84,11 @@
                     </padding>
                     <Label text="📋 Total a pagar:" styleClass="section-title"/>
                     <Label fx:id="totalAPagarLabel" text="Calculando..." styleClass="resumen-label"/>
+                    <Label fx:id="mensajeLabel" text="" styleClass="resumen-label" wrapText="true" visible="false">
+                        <font>
+                            <Font name="Segoe UI" size="14"/>
+                        </font>
+                    </Label>
                 </VBox>
 
                 <ListView fx:id="historialListView" prefHeight="200" styleClass="historial-list"/>
