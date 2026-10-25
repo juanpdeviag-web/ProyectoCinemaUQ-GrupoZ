@@ -62,4 +62,9 @@ public class Pelicula {
         this.duracionMinutos = duracionMinutos;
     }
 
+    @Override
+    public String toString() {
+        return titulo;
+    }
+
 }
