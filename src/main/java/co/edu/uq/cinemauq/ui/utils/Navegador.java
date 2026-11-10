@@ -21,6 +21,8 @@ public class Navegador {
     private static SesionCompra sesionCompra;
     private static Usuario usuarioActual;
     private static List<ReservaAsiento> reservasSeleccionadas;
+    private static co.edu.uq.cinemauq.core.repository.UserRepository userRepository;
+    private static co.edu.uq.cinemauq.core.ports.IPagoProcessor pagoProcessor;
 
     /**
      * Inicializa el navegador con el Stage principal y la sesión de compra.
@@ -121,5 +123,33 @@ public class Navegador {
      */
     public static List<ReservaAsiento> getReservasSeleccionadas() {
         return reservasSeleccionadas;
+    }
+
+    /**
+     * Establece el UserRepository para los servicios.
+     */
+    public static void setUserRepository(co.edu.uq.cinemauq.core.repository.UserRepository repo) {
+        userRepository = repo;
+    }
+
+    /**
+     * Obtiene el UserRepository.
+     */
+    public static co.edu.uq.cinemauq.core.repository.UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    /**
+     * Establece el PagoProcessor para los servicios.
+     */
+    public static void setPagoProcessor(co.edu.uq.cinemauq.core.ports.IPagoProcessor processor) {
+        pagoProcessor = processor;
+    }
+
+    /**
+     * Obtiene el PagoProcessor.
+     */
+    public static co.edu.uq.cinemauq.core.ports.IPagoProcessor getPagoProcessor() {
+        return pagoProcessor;
     }
 }

@@ -119,7 +119,11 @@ public class MisTicketsController implements Initializable {
             verDetalleLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #4A3F35; -fx-underline: true; -fx-cursor: hand;");
             verDetalleLabel.setOnMouseClicked(event -> verDetalleTicket(reservasGrupo));
 
-            ticketCard.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, verDetalleLabel);
+            Label cancelarLabel = new Label("❌ Cancelar compra");
+            cancelarLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #E74C3C; -fx-underline: true; -fx-cursor: hand;");
+            cancelarLabel.setOnMouseClicked(event -> onCancelarCompras());
+
+            ticketCard.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, verDetalleLabel, cancelarLabel);
             ticketsContainer.getChildren().add(ticketCard);
         }
     }
@@ -183,5 +187,10 @@ public class MisTicketsController implements Initializable {
     @FXML
     private void onIrACartelera() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+    }
+
+    @FXML
+    private void onCancelarCompras() {
+        Navegador.navegarA("/ui/views/cancelaciones.fxml", "CinemaUQ - Cancelación de Compras");
     }
 }
