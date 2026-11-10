@@ -10,11 +10,20 @@ public class Pelicula {
     private String titulo;
     private String genero;
     private int duracionMinutos;
+    private double precio;
 
     public Pelicula(String titulo, String genero, int duracionMinutos) {
         this.titulo = titulo;
         this.genero = genero;
         this.duracionMinutos = duracionMinutos;
+        this.precio = 15.0;
+    }
+
+    public Pelicula(String titulo, String genero, int duracionMinutos, double precio) {
+        this.titulo = titulo;
+        this.genero = genero;
+        this.duracionMinutos = duracionMinutos;
+        this.precio = precio;
     }
 
     // Getters y Setters básicos
@@ -39,6 +48,17 @@ public class Pelicula {
 
     public int getDuracionMinutos() {
         return duracionMinutos;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        if (precio <= 0) {
+            throw new PeliculaException("El precio de la película debe ser positivo");
+        }
+        this.precio = precio;
     }
 
     public void setTitulo(String titulo) {
