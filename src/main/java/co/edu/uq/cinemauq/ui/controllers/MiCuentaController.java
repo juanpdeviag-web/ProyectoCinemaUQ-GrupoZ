@@ -7,9 +7,9 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
+
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -44,25 +44,19 @@ public class MiCuentaController implements Initializable {
     private Button btnVolver;
 
     @FXML
-    private Button btnSalir;
-
-    @FXML
-    private VBox perfilContainer;
-
-    @FXML
-    private Label perfilNombreLabel;
-
-    @FXML
-    private Label perfilRolLabel;
+    private Button btnMisPuntos;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cargarInformacionUsuario();
-        configurarMenuPerfil();
+
     }
 
     private void cargarInformacionUsuario() {
         Usuario usuarioActual = Navegador.getUsuarioActual();
+        boolean esCliente = usuarioActual instanceof Cliente;
+        btnMisPuntos.setVisible(esCliente);
+        btnMisPuntos.setManaged(esCliente);
 
         if (usuarioActual != null) {
             idLabel.setText(usuarioActual.getId());
@@ -70,47 +64,29 @@ public class MiCuentaController implements Initializable {
             emailLabel.setText(usuarioActual.getCorreo());
 
             // Actualizar header
-            perfilNombreLabel.setText(usuarioActual.getNombre());
             if (usuarioActual instanceof Administrador) {
                 rolLabel.setText("Administrador");
-                perfilRolLabel.setText("Rol: Administrador");
             } else if (usuarioActual instanceof Cliente) {
                 rolLabel.setText("Cliente");
-                perfilRolLabel.setText("Rol: Cliente");
                 Cliente cliente = (Cliente) usuarioActual;
                 saldoContainer.setVisible(true);
                 saldoContainer.setManaged(true);
-                DecimalFormat df = new DecimalFormat("#,###.00");
+                DecimalFormat df = new DecimalFormat("#,##0.00");
                 saldoLabel.setText("$" + df.format(cliente.getTarjeta().getSaldo()) + " COP");
             }
         }
     }
 
-    private void configurarMenuPerfil() {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
-        miCuentaItem.setOnAction(event -> onMiCuenta());
-
-        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
-        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
-
-        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
-        misTicketsItem.setOnAction(event -> onMisTickets());
-
-        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
-        carteleraItem.setOnAction(event -> onIrACartelera());
-
-        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
-
-        perfilContainer.setOnMouseClicked(event -> {
-            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
-        });
-    }
-
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+    }
+
+    @FXML
+    private void onMisPuntos() {
+        if (Navegador.getUsuarioActual() instanceof Cliente) {
+            Navegador.navegarA("/ui/views/mis_puntos.fxml", "CinemaUQ - Mis puntos");
+        }
     }
 
     @FXML

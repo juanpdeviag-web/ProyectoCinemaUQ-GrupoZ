@@ -25,41 +25,44 @@ import java.util.Set;
  * Muestra la grilla de asientos de la sala y permite seleccionar los disponibles.
  */
 public class AsientosController implements Initializable {
-    
+
     @FXML
     private Label funcionInfoLabel;
-    
+
     @FXML
     private Label salaInfoLabel;
-    
+
     @FXML
     private GridPane asientosGrid;
-    
+
     @FXML
     private Label asientosSeleccionadosLabel;
-    
+
     @FXML
     private Label totalLabel;
-    
+
+    @FXML private Label cantidadLabel;
+    @FXML private javafx.scene.layout.StackPane mapaAsientos;
+
     @FXML
     private Button btnContinuar;
-    
+
     @FXML
     private Button btnVolver;
-    
+
     private SesionCompra sesionCompra;
     private Sala sala;
     private Set<String> asientosOcupados;
     private double precioEntrada;
-    
+
     /**
      * Inicializa el controlador.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // La inicialización se completa en cargarDatos()
+        mapaAsientos.widthProperty().addListener((obs, anterior, actual) -> ajustarPlano());
     }
-    
+
     /**
      * Carga los datos de la función seleccionada y renderiza los asientos.
      * Este método debe llamarse después de crear el controlador.
@@ -88,9 +91,20 @@ public class AsientosController implements Initializable {
 
         // Renderizar grilla de asientos
         renderizarAsientos();
+        ajustarPlano();
 
         // Actualizar resumen
         actualizarResumen();
+    }
+
+    private void ajustarPlano() {
+        double ancho = asientosGrid.prefWidth(-1);
+        if (ancho > 0 && mapaAsientos.getWidth() > 0) {
+            double escala = Math.min(1, mapaAsientos.getWidth() / ancho);
+            asientosGrid.setScaleX(escala);
+            asientosGrid.setScaleY(escala);
+            mapaAsientos.setPrefHeight(asientosGrid.prefHeight(-1) * escala);
+        }
     }
 
     /**
@@ -98,10 +112,10 @@ public class AsientosController implements Initializable {
      */
     private void renderizarAsientos() {
         asientosGrid.getChildren().clear();
-        
+
         int filas = sala.getCapacidadFilas();
         int columnas = sala.getCapacidadColumnas();
-        
+
         for (int fila = 0; fila < filas; fila++) {
             for (int columna = 0; columna < columnas; columna++) {
                 String idAsiento = FuncionesGenerator.generarIdAsiento(fila, columna);
@@ -110,16 +124,20 @@ public class AsientosController implements Initializable {
             }
         }
     }
-    
+
     /**
      * Crea un botón para un asiento específico.
      */
     private Button crearBotonAsiento(String idAsiento, int fila, int columna) {
         Button btn = new Button(idAsiento);
         btn.getStyleClass().add("asiento");
-        
+        var catalogo = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance();
+        boolean habilitado = catalogo.asientoHabilitado(sesionCompra.getFuncionSeleccionada(), idAsiento);
+        boolean accesible = catalogo.accesible(sesionCompra.getFuncionSeleccionada(), idAsiento);
+        if (accesible) btn.getStyleClass().add("asiento-accesible");
+
         // Determinar estado del asiento
-        if (asientosOcupados.contains(idAsiento)) {
+        if (!habilitado || asientosOcupados.contains(idAsiento)) {
             btn.getStyleClass().add("asiento-ocupado");
             btn.setDisable(true);
         } else if (sesionCompra.getAsientosSeleccionados().contains(idAsiento)) {
@@ -127,13 +145,14 @@ public class AsientosController implements Initializable {
         } else {
             btn.getStyleClass().add("asiento-disponible");
         }
-        
+
         // Manejar clic en asiento
         btn.setOnAction(event -> onToggleAsiento(idAsiento, btn));
-        
+        actualizarIndicadorAsiento(btn, idAsiento);
+
         return btn;
     }
-    
+
     /**
      * Maneja la selección/deselección de un asiento.
      */
@@ -141,7 +160,7 @@ public class AsientosController implements Initializable {
         if (asientosOcupados.contains(idAsiento)) {
             return; // Asiento ocupado, no se puede seleccionar
         }
-        
+
         if (sesionCompra.getAsientosSeleccionados().contains(idAsiento)) {
             // Deseleccionar
             sesionCompra.removerAsiento(idAsiento);
@@ -153,18 +172,32 @@ public class AsientosController implements Initializable {
             btn.getStyleClass().remove("asiento-disponible");
             btn.getStyleClass().add("asiento-seleccionado");
         }
-        
+
         actualizarResumen();
+        actualizarIndicadorAsiento(btn, idAsiento);
     }
-    
+
+    private void actualizarIndicadorAsiento(Button boton, String id) {
+        var catalogo = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance();
+        boolean habilitado = catalogo.asientoHabilitado(sesionCompra.getFuncionSeleccionada(), id);
+        boolean accesible = catalogo.accesible(sesionCompra.getFuncionSeleccionada(), id);
+        String estado = !habilitado ? "Deshabilitado" : asientosOcupados.contains(id) ? "Ocupado"
+                : sesionCompra.getAsientosSeleccionados().contains(id) ? "Seleccionado" : "Disponible";
+        boton.setText(id + (!habilitado || estado.equals("Ocupado") ? " ×" : estado.equals("Seleccionado") ? " ✓" : "") + (accesible ? " ♿" : ""));
+        String descripcion = "Asiento " + id + " · " + estado + (accesible ? " · Accesible" : "");
+        boton.setAccessibleText(descripcion);
+        boton.setTooltip(new javafx.scene.control.Tooltip(descripcion));
+    }
+
     /**
      * Actualiza el resumen de selección.
      */
     private void actualizarResumen() {
         List<String> seleccionados = sesionCompra.getAsientosSeleccionados();
         int cantidad = seleccionados.size();
+        cantidadLabel.setText("Cantidad: " + cantidad);
         double total = cantidad * precioEntrada;
-        
+
         if (cantidad == 0) {
             asientosSeleccionadosLabel.setText("Ningún asiento seleccionado");
             btnContinuar.setDisable(true);
@@ -172,10 +205,10 @@ public class AsientosController implements Initializable {
             asientosSeleccionadosLabel.setText("Asientos: " + String.join(", ", seleccionados));
             btnContinuar.setDisable(false);
         }
-        
+
         totalLabel.setText(String.format("Total: COP $%,.2f", total));
     }
-    
+
     /**
      * Maneja el botón de continuar.
      * Navega a la pantalla de confitería.
@@ -185,7 +218,7 @@ public class AsientosController implements Initializable {
         System.out.println("Continuar a confitería con asientos: " + sesionCompra.getAsientosSeleccionados());
         Navegador.navegarA("/ui/views/confiteria.fxml", "CinemaUQ - Confitería");
     }
-    
+
     /**
      * Maneja el botón de volver.
      * Regresa a la pantalla de funciones.
@@ -196,7 +229,7 @@ public class AsientosController implements Initializable {
         sesionCompra.limpiarAsientos();
         Navegador.navegarA("/ui/views/funciones.fxml", "CinemaUQ - Funciones");
     }
-    
+
     /**
      * Obtiene la sesión de compra actual.
      */
