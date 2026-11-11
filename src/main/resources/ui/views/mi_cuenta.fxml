@@ -115,6 +115,8 @@
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
+            <Button fx:id="btnMisPuntos" text="Mis puntos" onAction="#onMisPuntos"
+                    styleClass="boton-principal" visible="false" managed="false"/>
         </HBox>
     </bottom>
 

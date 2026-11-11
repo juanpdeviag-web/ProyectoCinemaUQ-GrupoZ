@@ -44,6 +44,9 @@ public class MiCuentaController implements Initializable {
     private Button btnVolver;
 
     @FXML
+    private Button btnMisPuntos;
+
+    @FXML
     private Button btnSalir;
 
     @FXML
@@ -63,6 +66,9 @@ public class MiCuentaController implements Initializable {
 
     private void cargarInformacionUsuario() {
         Usuario usuarioActual = Navegador.getUsuarioActual();
+        boolean esCliente = usuarioActual instanceof Cliente;
+        btnMisPuntos.setVisible(esCliente);
+        btnMisPuntos.setManaged(esCliente);
 
         if (usuarioActual != null) {
             idLabel.setText(usuarioActual.getId());
@@ -111,6 +117,13 @@ public class MiCuentaController implements Initializable {
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
+    }
+
+    @FXML
+    private void onMisPuntos() {
+        if (Navegador.getUsuarioActual() instanceof Cliente) {
+            Navegador.navegarA("/ui/views/mis_puntos.fxml", "CinemaUQ - Mis puntos");
+        }
     }
 
     @FXML
