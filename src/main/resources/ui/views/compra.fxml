@@ -1,103 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uq.cinemauq.ui.controllers.CompraController"
-            stylesheets="@../styles/estilos.css"
-            styleClass="root">
-
-    <top>
-        <VBox styleClass="header">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Label text="📋 Resumen de Compra" styleClass="title"/>
-            <Label text="Revisa los detalles de tu compra antes de confirmar" styleClass="subtitle"/>
-        </VBox>
-    </top>
-
-    <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
-            <VBox spacing="30" styleClass="content">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-
-                <VBox fx:id="resumenContainer" spacing="18" styleClass="compra-card" maxWidth="600">
-                    <padding>
-                        <Insets top="20" right="25" bottom="20" left="25"/>
-                    </padding>
-                    <Label text="🎬 Detalles de la Compra" styleClass="card-title"/>
-                    <VBox spacing="12" styleClass="detalle-item">
-                        <Label text="Película" styleClass="detalle-label"/>
-                        <Label fx:id="peliculaLabel" text="-" styleClass="detalle-valor"/>
-                    </VBox>
-                    <VBox spacing="12" styleClass="detalle-item">
-                        <Label text="Función" styleClass="detalle-label"/>
-                        <Label fx:id="funcionLabel" text="-" styleClass="detalle-valor"/>
-                    </VBox>
-                    <VBox spacing="12" styleClass="detalle-item">
-                        <Label text="Asientos" styleClass="detalle-label"/>
-                        <Label fx:id="asientosLabel" text="-" styleClass="detalle-valor"/>
-                    </VBox>
-                    <VBox spacing="12" styleClass="detalle-item">
-                        <Label text="Productos" styleClass="detalle-label"/>
-                        <Label fx:id="productosLabel" text="-" styleClass="detalle-valor"/>
-                    </VBox>
-                </VBox>
-
-                <VBox spacing="15" styleClass="compra-card descuentos-card" maxWidth="600">
-                    <padding>
-                        <Insets top="20" right="25" bottom="20" left="25"/>
-                    </padding>
-                    <Label text="🎟️ Descuentos Disponibles" styleClass="card-title"/>
-                    <VBox spacing="10">
-                        <CheckBox fx:id="chkDescuentoFijo" text="Descuento fijo de $5,000 COP" styleClass="descuento-checkbox"/>
-                        <CheckBox fx:id="chkPromocion" text="Promoción estudiante (10%)" styleClass="descuento-checkbox"/>
-                    </VBox>
-                </VBox>
-
-                <VBox spacing="15" styleClass="compra-card total-card" maxWidth="600">
-                    <padding>
-                        <Insets top="20" right="25" bottom="20" left="25"/>
-                    </padding>
-                    <Label text="💰 Resumen de Pagos" styleClass="card-title"/>
-                    <HBox spacing="20" styleClass="total-row">
-                        <Label text="Subtotal:" styleClass="total-label"/>
-                        <Label fx:id="subtotalLabel" text="0.00" styleClass="total-valor"/>
-                    </HBox>
-                    <HBox spacing="20" styleClass="total-row">
-                        <Label text="Descuento:" styleClass="total-label"/>
-                        <Label fx:id="descuentoLabel" text="0.00" styleClass="total-valor descuento"/>
-                    </HBox>
-                    <HBox spacing="20" styleClass="total-row final">
-                        <Label text="Total:" styleClass="total-label final"/>
-                        <Label fx:id="totalLabel" text="0.00" styleClass="total-valor final"/>
-                    </HBox>
-                </VBox>
-            </VBox>
-        </ScrollPane>
-    </center>
-
-    <bottom>
-        <VBox styleClass="footer">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <HBox alignment="CENTER" spacing="25">
-                <Button fx:id="btnVolver" text="← Volver" onAction="#onVolver" styleClass="button-secondary"/>
-                <Button fx:id="btnConfirmar" text="Confirmar Compra →" onAction="#onConfirmar" styleClass="button-primary" disable="true"/>
-            </HBox>
-        </VBox>
-    </bottom>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Group?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.CompraController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page">
+ <top><EncabezadoCinema titulo="Revisa tu compra" subtitulo="Comprueba entradas, confitería y promociones antes de continuar." activa=""/></top>
+ <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><VBox styleClass="content-container" alignment="TOP_CENTER">
+  <VBox maxWidth="1300" spacing="20" alignment="TOP_CENTER" styleClass="app-container">
+<FlowPane hgap="20" vgap="20" alignment="CENTER" maxWidth="1000">
+<VBox fx:id="resumenContainer" spacing="10" styleClass="card" maxWidth="460" prefWidth="460">
+ <Label text="Entradas" styleClass="section-title"/>
+ <Label fx:id="peliculaLabel" text="Película pendiente" styleClass="card-title" wrapText="true"/>
+ <Label fx:id="funcionLabel" text="Función pendiente" wrapText="true"/>
+ <Label fx:id="asientosLabel" text="Sin asientos seleccionados" wrapText="true"/>
+ <Separator/>
+ <Label text="Productos" styleClass="form-label"/>
+ <Label fx:id="productosLabel" text="Ninguno" wrapText="true"/>
+ <Label text="Combos" styleClass="form-label"/>
+ <Label fx:id="combosLabel" text="Ninguno" wrapText="true"/>
+</VBox>
+<VBox spacing="12" styleClass="card" maxWidth="460" prefWidth="460">
+ <Label text="Promociones disponibles" styleClass="section-title"/>
+ <CheckBox fx:id="chkDescuentoFijo" text="Descuento fijo de $5,000 COP" wrapText="true"/>
+ <CheckBox fx:id="chkPromocion" text="Promoción estudiante (10%)" wrapText="true"/>
+</VBox>
+</FlowPane>
+<VBox spacing="12" styleClass="card, purchase-points" maxWidth="940">
+ <Label text="Mis puntos" styleClass="section-title"/>
+ <Label fx:id="disponiblesPuntosLabel" text="Disponibles: 0 puntos" styleClass="form-label"/>
+ <Label fx:id="equivalenciaPuntosLabel" wrapText="true"/>
+ <Label text="100 puntos = $5 COP" styleClass="puntos-regla"/>
+ <Label text="Cantidad de puntos a utilizar" labelFor="$puntosField" styleClass="form-label"/>
+ <TextField fx:id="puntosField" promptText="Por ejemplo, 500" maxWidth="440" styleClass="form-field" onAction="#onAplicarPuntos"/>
+ <Label fx:id="mensajeLabel" visible="false" managed="false" wrapText="true"/>
+ <Label fx:id="redencionPreparadaLabel" text="Los puntos se consumen únicamente al confirmar un pago exitoso." wrapText="true" styleClass="mensaje-info"/>
+ <FlowPane hgap="12" vgap="8">
+  <Button fx:id="btnAplicarPuntos" text="Aplicar puntos" onAction="#onAplicarPuntos" styleClass="boton-principal"/>
+  <Button fx:id="btnQuitarPuntos" text="Quitar puntos" onAction="#onQuitarPuntos" styleClass="boton-secundario" visible="false" managed="false"/>
+ </FlowPane>
+</VBox>
+<VBox spacing="12" styleClass="card" maxWidth="940">
+ <Label text="Resumen de importes" styleClass="section-title"/>
+ <Label text="Subtotal" styleClass="form-label"/><Label fx:id="subtotalLabel" text="0"/>
+ <Label text="Promociones y descuentos" styleClass="form-label"/><Label fx:id="descuentoLabel" text="0"/>
+ <Label text="Descuento por puntos" styleClass="form-label"/><Label fx:id="descuentoPuntosLabel" text="0"/>
+ <Separator/><Label text="Total a pagar" styleClass="form-label"/>
+ <Label fx:id="totalLabel" text="0" styleClass="checkout-total" wrapText="true"/>
+ <Label text="Confirma el importe final en la pantalla de pago." styleClass="helper-text" wrapText="true"/>
+</VBox>
+  </VBox>
+ </VBox></ScrollPane></center>
+ <bottom><FlowPane styleClass="app-footer" alignment="CENTER" hgap="12" vgap="8">
+<Button fx:id="btnVolver" text="Volver a confitería" onAction="#onVolver" styleClass="boton-secundario"/>
+<Button fx:id="btnConfirmar" text="Continuar al pago" onAction="#onConfirmar" styleClass="boton-principal" disable="true"/>
+ </FlowPane></bottom>
 </BorderPane>

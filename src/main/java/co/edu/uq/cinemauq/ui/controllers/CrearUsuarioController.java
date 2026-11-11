@@ -75,6 +75,9 @@ public class CrearUsuarioController implements Initializable {
 
     @FXML
     private void onCrear() {
+        for (javafx.scene.Node campo : new javafx.scene.Node[]{idTextField, nombreTextField, emailTextField, contrasenaField, confirmarContrasenaField, rolComboBox, saldoInicialTextField}) {
+            campo.getStyleClass().remove("form-error");
+        }
         String id = idTextField.getText();
         String nombre = nombreTextField.getText();
         String email = emailTextField.getText();
@@ -86,44 +89,51 @@ public class CrearUsuarioController implements Initializable {
         // Validaciones
         if (id == null || id.trim().isEmpty()) {
             infoLabel.setText("Por favor ingresa un ID");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(idTextField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         if (nombre == null || nombre.trim().isEmpty()) {
             infoLabel.setText("Por favor ingresa un nombre");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(nombreTextField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         if (email == null || !email.contains("@")) {
             infoLabel.setText("Por favor ingresa un email válido");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(emailTextField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         if (contrasena == null || contrasena.trim().isEmpty()) {
             infoLabel.setText("Por favor ingresa una contraseña");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(contrasenaField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         if (!contrasena.equals(confirmarContrasena)) {
             infoLabel.setText("Las contraseñas no coinciden");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(confirmarContrasenaField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         if (rol == null) {
             infoLabel.setText("Por favor selecciona un rol");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(rolComboBox);
+            estiloMensaje("mensaje-error");
             return;
         }
 
         // Verificar si el ID ya existe
         if (UserSeeder.buscarUsuarioPorId(id) != null) {
             infoLabel.setText("El ID ya existe. Usa otro ID.");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            marcarCampo(idTextField);
+            estiloMensaje("mensaje-error");
             return;
         }
 
@@ -138,7 +148,8 @@ public class CrearUsuarioController implements Initializable {
                     ((Cliente) nuevoUsuario).getTarjeta().recargar(saldo);
                 } catch (NumberFormatException e) {
                     infoLabel.setText("Saldo inválido. Se usará 0.");
-                    infoLabel.setStyle("-fx-text-fill: #e94560;");
+                    marcarCampo(saldoInicialTextField);
+                    estiloMensaje("mensaje-error");
                 }
             }
         } else {
@@ -150,7 +161,7 @@ public class CrearUsuarioController implements Initializable {
             nuevoUsuario.validar();
         } catch (Exception e) {
             infoLabel.setText("Error de validación: " + e.getMessage());
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            estiloMensaje("mensaje-error");
             return;
         }
 
@@ -159,7 +170,7 @@ public class CrearUsuarioController implements Initializable {
 
         System.out.println("Usuario creado exitosamente: " + nombre + " (" + rol + ")");
         infoLabel.setText("Usuario creado exitosamente: " + nombre);
-        infoLabel.setStyle("-fx-text-fill: #8B7355;");
+        estiloMensaje("mensaje-exito");
 
         // Limpiar campos
         idTextField.clear();
@@ -171,6 +182,24 @@ public class CrearUsuarioController implements Initializable {
         rolComboBox.getSelectionModel().clearSelection();
     }
 
+    private void estiloMensaje(String estilo) {
+        infoLabel.getStyleClass().removeAll("mensaje-info", "mensaje-error", "mensaje-exito");
+        infoLabel.getStyleClass().add(estilo);
+        if ("mensaje-exito".equals(estilo)) {
+            javafx.scene.layout.VBox contenedor = (javafx.scene.layout.VBox) btnCrear.getParent();
+            contenedor.getChildren().remove(infoLabel);
+            contenedor.getChildren().add(contenedor.getChildren().indexOf(btnCrear), infoLabel);
+        }
+    }
+
+    private void marcarCampo(javafx.scene.control.Control campo) {
+        campo.getStyleClass().remove("form-error");
+        campo.getStyleClass().add("form-error");
+        javafx.scene.layout.VBox contenedor = (javafx.scene.layout.VBox) campo.getParent();
+        contenedor.getChildren().remove(infoLabel);
+        contenedor.getChildren().add(contenedor.getChildren().indexOf(campo) + 1, infoLabel);
+        campo.requestFocus();
+    }
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/login.fxml", "CinemaUQ - Iniciar Sesión");

@@ -37,26 +37,15 @@ public class CancelacionController implements Initializable {
     @FXML
     private Button btnVolver;
 
-    @FXML
-    private Button btnSalir;
-
-    @FXML
-    private VBox perfilContainer;
-
-    @FXML
-    private Label perfilNombreLabel;
-
-    @FXML
-    private Label perfilRolLabel;
-
-    private CancelacionService cancelacionService;
+private CancelacionService cancelacionService;
     private DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        sinComprasLabel.managedProperty().bind(sinComprasLabel.visibleProperty());
         inicializarCancelacionService();
         cargarCompras();
-        configurarMenuPerfil();
+
     }
 
     private void inicializarCancelacionService() {
@@ -67,6 +56,7 @@ public class CancelacionController implements Initializable {
     }
 
     private void cargarCompras() {
+        comprasContainer.getChildren().clear();
         Usuario usuarioActual = Navegador.getUsuarioActual();
 
         if (usuarioActual == null) {
@@ -75,12 +65,6 @@ public class CancelacionController implements Initializable {
             return;
         }
 
-        perfilNombreLabel.setText(usuarioActual.getNombre());
-        if (usuarioActual instanceof Administrador) {
-            perfilRolLabel.setText("Rol: Administrador");
-        } else {
-            perfilRolLabel.setText("Rol: Cliente");
-        }
 
         List<ReservaAsiento> reservas = ReservasManager.getInstance().getReservasPorUsuario(usuarioActual.getId());
 
@@ -110,36 +94,49 @@ public class CancelacionController implements Initializable {
 
         VBox card = new VBox();
         card.setSpacing(10);
-        card.setStyle("-fx-background-color: #FAF8F5; -fx-background-radius: 10; -fx-padding: 15; -fx-border-color: #C4A77D; -fx-border-radius: 10; -fx-border-width: 1;");
+        card.getStyleClass().add("card");
 
         Label peliculaLabel = new Label("🎬 " + primera.getPeliculaTitulo());
-        peliculaLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #4A3F35;");
+        peliculaLabel.getStyleClass().add("card-title");
 
         Label fechaLabel = new Label("📅 " + primera.getFechaFuncion().format(fechaFormatter));
-        fechaLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+        fechaLabel.getStyleClass().add("helper-text");
 
         Label salaLabel = new Label("🏢 Sala " + primera.getSalaNumero());
-        salaLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+        salaLabel.getStyleClass().add("helper-text");
 
         String asientos = reservas.stream()
             .map(ReservaAsiento::getAsientoId)
             .sorted()
             .collect(Collectors.joining(", "));
         Label asientosLabel = new Label("💺 Asientos: " + asientos);
-        asientosLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+        asientosLabel.getStyleClass().add("helper-text");
 
         double total = reservas.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
         Label totalLabel = new Label("💰 Total: COP $" + String.format("%,.0f", total));
-        totalLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #C4A77D;");
+        totalLabel.getStyleClass().add("stat-value");
 
         Label tiempoRestanteLabel = calcularTiempoRestante(primera.getFechaFuncion());
-        tiempoRestanteLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #8B7355;");
+        tiempoRestanteLabel.getStyleClass().add("helper-text");
 
         Button btnCancelar = new Button("❌ Cancelar Compra");
-        btnCancelar.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;");
+        btnCancelar.getStyleClass().add("boton-peligro");
         btnCancelar.setOnAction(event -> mostrarDialogoCancelacion(compraId, primera.getPeliculaTitulo(), total));
 
         card.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, tiempoRestanteLabel, btnCancelar);
+        boolean reembolsada = cancelacionService.getHistorialReembolsos().stream()
+                .anyMatch(r -> r.idCompra().equals(compraId) && r.procesado());
+        long horas = Duration.between(LocalDateTime.now(), primera.getFechaFuncion()).toHours();
+        Label estado = new Label(reembolsada ? "REEMBOLSADO" : horas < 2 ? "NO CANCELABLE" : "CANCELABLE POR HORARIO");
+        estado.getStyleClass().add(reembolsada ? "estado-inactivo" : "estado-activo");
+        card.getChildren().add(1, estado);
+        btnCancelar.setDisable(reembolsada || horas < 2);
+        if (btnCancelar.isDisabled()) {
+            btnCancelar.setTooltip(new Tooltip(reembolsada ? "Compra reembolsada" : "Fuera del plazo de cancelación"));
+        }
+        for (javafx.scene.Node nodo : card.getChildren()) {
+            if (nodo instanceof Label etiqueta) etiqueta.setWrapText(true);
+        }
         return card;
     }
 
@@ -161,6 +158,7 @@ public class CancelacionController implements Initializable {
 
     private void mostrarDialogoCancelacion(String compraId, String peliculaTitulo, double monto) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        aplicarTema(alert);
         alert.setTitle("Cancelar Compra");
         alert.setHeaderText("¿Deseas cancelar la compra de: " + peliculaTitulo + "?");
         alert.setContentText("Monto original: COP $" + String.format("%,.0f", monto) + "\n\nEl reembolso se aplicará según la política vigente.");
@@ -205,9 +203,10 @@ public class CancelacionController implements Initializable {
 
     private void mostrarReembolsoExitoso(Reembolso reembolso) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        aplicarTema(alert);
         alert.setTitle("Reembolso Procesado");
         alert.setHeaderText("✅ Reembolso Exitoso");
-        
+
         String mensaje = String.format(
             "Monto reembolsado: COP $%,.0f\n" +
             "Porcentaje aplicado: %.0f%%\n" +
@@ -218,79 +217,34 @@ public class CancelacionController implements Initializable {
             reembolso.politicaAplicada(),
             reembolso.fechaReembolso().format(fechaFormatter)
         );
-        
+
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
 
     private void mostrarError(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        aplicarTema(alert);
         alert.setTitle("Error");
         alert.setHeaderText("No se pudo procesar la cancelación");
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
 
-    private void configurarMenuPerfil() {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
-        miCuentaItem.setOnAction(event -> onMiCuenta());
-
-        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
-        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
-
-        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
-        misTicketsItem.setOnAction(event -> onMisTickets());
-
-        MenuItem cancelacionesItem = new MenuItem("❌ Cancelaciones");
-        cancelacionesItem.setOnAction(event -> onCancelaciones());
-
-        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
-        carteleraItem.setOnAction(event -> onIrACartelera());
-
-        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, cancelacionesItem, carteleraItem);
-
-        perfilContainer.setOnMouseClicked(event -> {
-            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
-        });
+    private void aplicarTema(Alert alerta) {
+        alerta.getDialogPane().getStylesheets().add(getClass().getResource("/ui/styles/estilos.css").toExternalForm());
+        alerta.getDialogPane().getStyleClass().add("root-app");
     }
 
-    @FXML
+@FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
     }
 
-    @FXML
-    private void onSalir() {
-        System.exit(0);
-    }
-
-    @FXML
-    private void onMiCuenta() {
-        Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
-    }
-
-    @FXML
-    private void onTarjetaVirtual() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual instanceof Cliente) {
-            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
-        }
-    }
-
-    @FXML
-    private void onMisTickets() {
-        Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
-    }
-
-    @FXML
+@FXML
     private void onCancelaciones() {
         // Ya estamos en Cancelaciones
     }
 
-    @FXML
-    private void onIrACartelera() {
-        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
-    }
+
 }

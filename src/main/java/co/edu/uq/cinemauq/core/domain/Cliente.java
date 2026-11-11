@@ -1,5 +1,8 @@
 package co.edu.uq.cinemauq.core.domain;
 import co.edu.uq.cinemauq.core.exceptions.UsuarioException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Representa un cliente del sistema.
@@ -9,12 +12,12 @@ import co.edu.uq.cinemauq.core.exceptions.UsuarioException;
 
 public class Cliente extends Usuario {
     private TarjetaVirtual tarjeta;
-    private int puntos;
+    private final List<PuntoCinemaUQ> puntosAcumulados;
 
     public Cliente(String id, String nombre, String correo) {
         super(id, nombre, correo);
         this.tarjeta = new TarjetaVirtual(); // RN-001: Tarjeta asociada por negocio
-        this.puntos = 0;
+        this.puntosAcumulados = new ArrayList<>();
     }
 
     @Override
@@ -28,8 +31,11 @@ public class Cliente extends Usuario {
         if (this.tarjeta == null) {
             throw new UsuarioException("El cliente debe tener una tarjeta virtual asociada (RN-001)");
         }
-        if (this.puntos < 0) {
-            throw new UsuarioException("Los puntos del cliente no pueden ser negativos");
+        for (PuntoCinemaUQ lote : puntosAcumulados) {
+            if (lote == null || lote.getCantidad() <= 0 || lote.getCantidadRestante() < 0
+                    || lote.getCantidadRestante() > lote.getCantidad()) {
+                throw new UsuarioException("El cliente tiene un lote de puntos inválido");
+            }
         }
     }
 
@@ -37,14 +43,27 @@ public class Cliente extends Usuario {
         if (cantidad < 0) {
             throw new UsuarioException("La cantidad de puntos para agregar deben ser positivas");
         }
-        this.puntos += cantidad;
+        if (cantidad > 0) {
+            agregarPuntos(new PuntoCinemaUQ(cantidad, java.time.LocalDate.now()));
+        }
+    }
+
+    public void agregarPuntos(PuntoCinemaUQ lote) {
+        if (lote == null || puntosAcumulados.contains(lote)) {
+            throw new UsuarioException("El lote no puede ser nulo ni estar registrado previamente");
+        }
+        puntosAcumulados.add(lote);
+    }
+
+    public List<PuntoCinemaUQ> getPuntosAcumulados() {
+        return Collections.unmodifiableList(puntosAcumulados);
     }
 
     public boolean verificarPuntosAcumulados(int puntosRequeridos) {
         if (puntosRequeridos < 0) {
             throw new UsuarioException("Los puntos requeridos no pueden ser negativos");
         }
-        return this.puntos >= puntosRequeridos;
+        return getPuntos() >= puntosRequeridos;
     }
 
     public TarjetaVirtual getTarjeta() {
@@ -63,7 +82,33 @@ public class Cliente extends Usuario {
     }
 
     public int getPuntos() {
-        return puntos;
+        return puntosAcumulados.stream()
+                .filter(PuntoCinemaUQ::estaDisponible)
+                .mapToInt(PuntoCinemaUQ::getCantidadRestante)
+                .reduce(0, Math::addExact);
+    }
+
+    /** Revierte saldo, historial y lotes si falla una confirmación de pago en memoria. */
+    public synchronized <T> T ejecutarPagoAtomico(java.util.function.Supplier<T> operacion) {
+        TarjetaVirtual tarjetaOriginal = tarjeta;
+        synchronized (tarjetaOriginal) {
+            TarjetaVirtual.Respaldo respaldoTarjeta = tarjetaOriginal.respaldar();
+            List<PuntoCinemaUQ> lotesOriginales = new ArrayList<>(puntosAcumulados);
+            List<PuntoCinemaUQ.Respaldo> respaldos = lotesOriginales.stream()
+                    .map(PuntoCinemaUQ::respaldar).toList();
+            try {
+                return operacion.get();
+            } catch (RuntimeException | Error fallo) {
+                tarjeta = tarjetaOriginal;
+                tarjetaOriginal.restaurar(respaldoTarjeta);
+                puntosAcumulados.clear();
+                puntosAcumulados.addAll(lotesOriginales);
+                for (int i = 0; i < lotesOriginales.size(); i++) {
+                    lotesOriginales.get(i).restaurar(respaldos.get(i));
+                }
+                throw fallo;
+            }
+        }
     }
 
 }

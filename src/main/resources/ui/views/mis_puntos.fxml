@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uq.cinemauq.ui.controllers.MisPuntosController"
+            stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page, puntos-page">
+    <top><EncabezadoCinema titulo="Mis Puntos CinemaUQ" subtitulo="Consulta tus lotes y redime tus puntos. 100 puntos = $5." activa="mis_puntos"/></top>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="puntos-scroll">
+            <VBox spacing="24" styleClass="puntos-contenido" alignment="TOP_CENTER"><VBox maxWidth="1300" spacing="20">
+                <Label text="Tus puntos de un vistazo" styleClass="puntos-seccion"/>
+                <FlowPane hgap="16" vgap="16" alignment="CENTER">
+                    <VBox spacing="8" styleClass="puntos-card">
+                        <Label text="Puntos disponibles" styleClass="puntos-card-titulo"/>
+                        <Label fx:id="disponiblesLabel" text="0" styleClass="puntos-card-valor"/>
+                        <Label text="Vigentes y listos para redimir" wrapText="true" styleClass="puntos-ayuda"/>
+                    </VBox>
+                    <VBox spacing="8" styleClass="puntos-card">
+                        <Label text="Puntos vencidos" styleClass="puntos-card-titulo"/>
+                        <Label fx:id="vencidosLabel" text="0" styleClass="puntos-card-valor"/>
+                        <Label text="Remanentes que ya no puedes utilizar" wrapText="true" styleClass="puntos-ayuda"/>
+                    </VBox>
+                    <VBox spacing="8" styleClass="puntos-card">
+                        <Label text="Próximo vencimiento" styleClass="puntos-card-titulo"/>
+                        <Label fx:id="proximoVencimientoLabel" text="Sin próximos vencimientos"
+                               wrapText="true" styleClass="puntos-card-fecha"/>
+                        <Label text="Puedes usarlos hasta esa fecha, inclusive" wrapText="true" styleClass="puntos-ayuda"/>
+                    </VBox>
+                    <VBox spacing="8" styleClass="puntos-card">
+                        <Label text="Valor equivalente disponible" styleClass="puntos-card-titulo" wrapText="true"/>
+                        <Label fx:id="equivalenteLabel" text="\$0,00 COP" wrapText="true" styleClass="puntos-card-valor"/>
+                        <Label text="100 puntos = $5" styleClass="puntos-ayuda"/>
+                    </VBox>
+                </FlowPane>
+                <VBox spacing="12" styleClass="puntos-panel">
+                    <Label text="Lotes de puntos" styleClass="puntos-seccion"/>
+                    <Label text="Cada lote vence un año después de su obtención. Los puntos originales se conservan como referencia."
+                           wrapText="true" styleClass="puntos-ayuda"/>
+                    <TableView fx:id="lotesTable" styleClass="puntos-table" prefHeight="280" minHeight="180">
+                        <columns>
+                            <TableColumn fx:id="originalesColumn" text="Originales" prefWidth="130" minWidth="75"/>
+                            <TableColumn fx:id="restantesColumn" text="Restantes" prefWidth="130" minWidth="75"/>
+                            <TableColumn fx:id="obtencionColumn" text="Obtención" prefWidth="160" minWidth="95"/>
+                            <TableColumn fx:id="vencimientoColumn" text="Vencimiento" prefWidth="170" minWidth="95"/>
+                            <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="140" minWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+                <VBox spacing="14" styleClass="puntos-panel">
+                    <Label text="Redimir puntos" styleClass="puntos-seccion"/>
+                    <Label text="100 puntos = $5" styleClass="puntos-regla"/>
+                    <Label fx:id="disponibilidadLabel" wrapText="true" styleClass="puntos-ayuda"/>
+                    <Label text="Cantidad de puntos" labelFor="$cantidadField" styleClass="puntos-card-titulo"/>
+                    <TextField fx:id="cantidadField" promptText="Escribe una cantidad entera, por ejemplo 100"
+                               onAction="#onRedimir" maxWidth="440" styleClass="puntos-campo"/>
+                    <Label fx:id="vistaPreviaLabel" text="Valor equivalente: $0,00 COP"
+                           wrapText="true" styleClass="puntos-equivalencia"/>
+                    <Label text="Redimir aquí consume puntos sin asociarlos a una compra. Para obtener un descuento al pagar, aplícalos en el resumen de compra."
+                           wrapText="true" styleClass="puntos-ayuda"/>
+                    <Button fx:id="btnRedimir" text="Redimir puntos" onAction="#onRedimir" styleClass="boton-principal"/>
+                    <Label fx:id="mensajeLabel" wrapText="true" visible="false" managed="false"/>
+                </VBox>
+            </VBox>
+        </VBox></ScrollPane>
+    </center>
+<bottom><FlowPane alignment="CENTER" styleClass="app-footer"><Button text="Volver a Mi Cuenta" onAction="#onVolver" styleClass="boton-secundario"/></FlowPane></bottom></BorderPane>

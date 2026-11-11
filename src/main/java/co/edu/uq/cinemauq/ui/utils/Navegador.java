@@ -65,9 +65,13 @@ public class Navegador {
                 ((co.edu.uq.cinemauq.ui.controllers.AdminPanelController) controller).cargarDatos(usuarioActual);
             }
 
-            Scene scene = new Scene(root, 1920, 1080);
             primaryStage.setTitle(titulo);
-            primaryStage.setScene(scene);
+            if (primaryStage.getScene() == null) {
+                primaryStage.setScene(new Scene(root));
+            } else {
+                // Conservar la escena y el tamaño de la ventana al cambiar de vista.
+                primaryStage.getScene().setRoot(root);
+            }
             primaryStage.show();
         } catch (IOException e) {
             System.err.println("Error al cargar la vista: " + fxmlPath);
