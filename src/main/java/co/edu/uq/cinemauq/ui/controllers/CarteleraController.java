@@ -110,7 +110,7 @@ public class CarteleraController {
      * Carga las películas desde DataSeeder y crea las tarjetas visuales.
      */
     private void cargarPeliculas() {
-        todasLasPeliculas = DataSeeder.cargarPeliculas();
+        todasLasPeliculas = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().peliculasActivas();
         mostrarPeliculas(todasLasPeliculas);
         actualizarContador(todasLasPeliculas.size());
     }

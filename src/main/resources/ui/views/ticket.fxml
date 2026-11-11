@@ -11,6 +11,8 @@
   <VBox maxWidth="1300" spacing="20" alignment="TOP_CENTER" styleClass="app-container">
 <VBox spacing="14" styleClass="card, receipt-card" maxWidth="720">
  <Label text="CINEMAUQ · COMPROBANTE" styleClass="form-label"/>
+ <Label fx:id="compraIdLabel" text="Compra pendiente" wrapText="true" styleClass="helper-text"/>
+ <Label fx:id="estadoCompraLabel" text="Sin compra confirmada" styleClass="form-label"/>
  <Label fx:id="peliculaLabel" text="No hay reservas para mostrar" styleClass="section-title" wrapText="true"/>
  <Separator/>
  <Label fx:id="fechaLabel" text="Fecha pendiente"/><Label fx:id="horaLabel" text="Hora pendiente"/>

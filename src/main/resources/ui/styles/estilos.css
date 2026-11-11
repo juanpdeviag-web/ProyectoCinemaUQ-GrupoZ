@@ -1726,3 +1726,23 @@
     -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
+
+/* Administración: navegación visible y distribución adaptable. */
+.admin-navigation { -fx-background-color: #5D4A65; -fx-padding: 14; -fx-background-radius: 14; }
+.admin-seat-plan { -fx-background-color: #FFD9EA; -fx-padding: 16; -fx-background-radius: 12; }
+.admin-navigation .nav-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 10 14;
+    -fx-background-radius: 8;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+}
+.admin-navigation .nav-item:hover { -fx-background-color: #986B8A; }
+.admin-navigation .nav-item-active {
+    -fx-background-color: #EB95B7;
+    -fx-text-fill: #5D4A65;
+    -fx-font-weight: bold;
+}
+.admin-navigation .nav-item:focused { -fx-border-color: #EB95B7; -fx-border-radius: 8; }
+.asiento-accesible { -fx-border-color: #986B8A; -fx-border-width: 3; }

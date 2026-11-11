@@ -1,6 +1,7 @@
 package co.edu.uq.cinemauq.ui.controllers;
 
 import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
+import co.edu.uq.cinemauq.core.domain.CompraConfirmada;
 import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
@@ -15,7 +16,7 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -54,9 +55,9 @@ public class MisTicketsController implements Initializable {
 
 
         // Obtener reservas del usuario
-        List<ReservaAsiento> reservas = ReservasManager.getInstance().getReservasPorUsuario(usuarioActual.getId());
+        List<CompraConfirmada> compras = ReservasManager.getInstance().listarComprasPorUsuario(usuarioActual.getId());
 
-        if (reservas.isEmpty()) {
+        if (compras.isEmpty()) {
             sinTicketsLabel.setText("No tienes tickets comprados aún");
             sinTicketsLabel.setVisible(true);
             return;
@@ -64,17 +65,11 @@ public class MisTicketsController implements Initializable {
 
         sinTicketsLabel.setVisible(false);
 
-        // Agrupar reservas por función (mismo película, fecha, sala)
-        Map<String, List<ReservaAsiento>> reservasPorFuncion = reservas.stream()
-            .collect(Collectors.groupingBy(r -> r.getFuncionId()));
-
-        // Mostrar cada grupo de reservas como un ticket
         DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
-
-        for (Map.Entry<String, List<ReservaAsiento>> entry : reservasPorFuncion.entrySet()) {
-            List<ReservaAsiento> reservasGrupo = entry.getValue();
+        ticketsContainer.getChildren().clear();
+        for (CompraConfirmada registro : compras) {
+            List<ReservaAsiento> reservasGrupo = registro.reservas();
             ReservaAsiento primera = reservasGrupo.get(0);
-
             VBox ticketCard = new VBox();
             ticketCard.setSpacing(10);
             ticketCard.getStyleClass().add("card");
@@ -95,8 +90,8 @@ public class MisTicketsController implements Initializable {
             Label asientosLabel = new Label("💺 Asientos: " + asientos);
             asientosLabel.getStyleClass().add("helper-text");
 
-            double total = reservasGrupo.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
-            Label totalLabel = new Label("💰 Total: COP $" + String.format("%,.0f", total));
+            double total = registro.importePagado().doubleValue();
+            Label totalLabel = new Label("💰 Total: COP $" + String.format("%,.2f", total));
             totalLabel.getStyleClass().add("stat-value");
 
             Button verDetalleLabel = new Button("Ver detalle");
@@ -108,12 +103,23 @@ public class MisTicketsController implements Initializable {
             cancelarLabel.setOnAction(event -> onCancelarCompras());
 
             ticketCard.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, verDetalleLabel, cancelarLabel);
-            Label estado = new Label(primera.getFechaFuncion().isBefore(java.time.LocalDateTime.now())
+            Label estado = new Label(registro.compra().estaCancelada() ? "Estado: CANCELADA · REEMBOLSADA" : primera.getFechaFuncion().isBefore(java.time.LocalDateTime.now())
                     ? "Estado: función realizada" : "Estado: próxima función");
             estado.getStyleClass().add("estado-activo");
             ticketCard.getChildren().add(1, estado);
             for (javafx.scene.Node nodo : ticketCard.getChildren()) {
                 if (nodo instanceof Label etiqueta) etiqueta.setWrapText(true);
+            }
+            ticketCard.setUserData(registro.compra().id());
+            Label identidad = new Label("Compra: " + registro.compra().id());
+            identidad.setId("compraIdLabel");
+            identidad.setWrapText(true);
+            identidad.getStyleClass().add("helper-text");
+            ticketCard.getChildren().add(1, identidad);
+            cancelarLabel.setUserData(registro.compra().id());
+            // Esta acción permite consultar el estado; el botón de cancelar se controla en Cancelaciones.
+            if (registro.compra().estaCancelada()) {
+                cancelarLabel.setTooltip(new javafx.scene.control.Tooltip("Consultar el reembolso de esta compra"));
             }
             ticketsContainer.getChildren().add(ticketCard);
         }

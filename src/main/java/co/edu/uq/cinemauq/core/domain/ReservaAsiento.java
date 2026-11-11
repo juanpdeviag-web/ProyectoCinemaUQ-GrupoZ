@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class ReservaAsiento {
 
     private final String id;
+    private final String compraId;
     private final String usuarioId;
     private final String usuarioNombre;
     private final String funcionId;
@@ -22,7 +23,14 @@ public class ReservaAsiento {
     public ReservaAsiento(String usuarioId, String usuarioNombre, String funcionId,
                           String peliculaTitulo, String salaNumero, LocalDateTime fechaFuncion,
                           String asientoId, double montoPagado) {
+        this(null, usuarioId, usuarioNombre, funcionId, peliculaTitulo, salaNumero, fechaFuncion, asientoId, montoPagado);
+    }
+
+    public ReservaAsiento(String compraId, String usuarioId, String usuarioNombre, String funcionId,
+                          String peliculaTitulo, String salaNumero, LocalDateTime fechaFuncion,
+                          String asientoId, double montoPagado) {
         this.id = java.util.UUID.randomUUID().toString();
+        this.compraId = compraId == null ? this.id : compraId;
         this.usuarioId = usuarioId;
         this.usuarioNombre = usuarioNombre;
         this.funcionId = funcionId;
@@ -37,6 +45,8 @@ public class ReservaAsiento {
     public String getId() {
         return id;
     }
+
+    public String getCompraId() { return compraId; }
 
     public String getUsuarioId() {
         return usuarioId;

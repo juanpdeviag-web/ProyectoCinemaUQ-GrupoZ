@@ -23,8 +23,7 @@
 </VBox>
 <VBox spacing="12" styleClass="card" maxWidth="460" prefWidth="460">
  <Label text="Promociones disponibles" styleClass="section-title"/>
- <CheckBox fx:id="chkDescuentoFijo" text="Descuento fijo de $5,000 COP" wrapText="true"/>
- <CheckBox fx:id="chkPromocion" text="Promoción estudiante (10%)" wrapText="true"/>
+ <VBox fx:id="promocionesContainer" spacing="10"/>
 </VBox>
 </FlowPane>
 <VBox spacing="12" styleClass="card, purchase-points" maxWidth="940">
