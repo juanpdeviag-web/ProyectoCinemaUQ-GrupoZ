@@ -15,12 +15,14 @@ public class Funcion {
     private Pelicula pelicula;
     private Sala sala;
     private LocalDateTime fechaHora;
+    private final String id;
 
     public Funcion(Pelicula pelicula, Sala sala, LocalDateTime fechaHora) {
         this.id = UUID.randomUUID().toString();
         this.pelicula = pelicula;
         this.sala = sala;
         this.fechaHora = fechaHora;
+        this.id = UUID.randomUUID().toString();
     }
 
     public String getId() {
@@ -68,6 +70,10 @@ public class Funcion {
 
     public LocalDateTime getFechaHora() {
         return fechaHora;
+    }
+
+    public String getId() {
+        return id;
     }
 
 }
