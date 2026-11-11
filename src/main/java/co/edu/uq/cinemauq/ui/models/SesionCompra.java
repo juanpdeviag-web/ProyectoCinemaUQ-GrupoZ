@@ -7,11 +7,11 @@ import co.edu.uq.cinemauq.patterns.composite.ItemCompra;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+
 import java.util.UUID;
-import co.edu.uq.cinemauq.patterns.decorator.CompraBase;
-import co.edu.uq.cinemauq.patterns.decorator.DescuentoFijo;
-import co.edu.uq.cinemauq.patterns.decorator.Promocion;
+
+
+
 
 /**
  * Clase que mantiene el estado de una compra en curso a través de las diferentes pantallas.
@@ -31,11 +31,17 @@ public class SesionCompra {
     private String clientePuntosId;
     private String idCompra = UUID.randomUUID().toString();
     private ComprobantePago pagoConfirmado;
+    private final java.util.Set<String> promocionesAdicionales = new java.util.LinkedHashSet<>();
+    private final co.edu.uq.cinemauq.services.CatalogoCinema catalogo;
 
     public record ComprobantePago(String idCompra, String clienteId, BigDecimal cobrado, int puntosRedimidos,
                                  BigDecimal descuentoPuntos, int puntosGenerados) { }
 
     public SesionCompra() {
+        this(co.edu.uq.cinemauq.services.CatalogoCinema.getInstance());
+    }
+    public SesionCompra(co.edu.uq.cinemauq.services.CatalogoCinema catalogo) {
+        this.catalogo = java.util.Objects.requireNonNull(catalogo);
         this.asientosSeleccionados = new ArrayList<>();
         this.productosSeleccionados = new ArrayList<>();
         this.precioEntrada = 60000.0; // Precio base de entrada en COP
@@ -130,6 +136,7 @@ public class SesionCompra {
         quitarPuntos();
         descuentoFijo = false;
         promocionEstudiante = false;
+        promocionesAdicionales.clear();
         // Conservar el comprobante para que un reintento no repita el cobro.
     }
 
@@ -152,14 +159,30 @@ public class SesionCompra {
             idCompra = UUID.randomUUID().toString();
             descuentoFijo = false;
             promocionEstudiante = false;
+            promocionesAdicionales.clear();
         }
     }
 
     public BigDecimal calcularTotalConPromociones() {
-        co.edu.uq.cinemauq.patterns.decorator.Compra compra = new CompraBase("Entradas y confitería", calcularTotal());
-        if (descuentoFijo) compra = new DescuentoFijo(compra, 5000.0);
-        if (promocionEstudiante) compra = new Promocion(compra, "Estudiante", 10.0);
-        return BigDecimal.valueOf(compra.precio()).setScale(2, RoundingMode.HALF_UP);
+        return catalogo.aplicarPromociones(BigDecimal.valueOf(calcularTotal()), getPromocionesSeleccionadas());
+    }
+
+    public java.util.Set<String> getPromocionesSeleccionadas() {
+        java.util.Set<String> ids = new java.util.LinkedHashSet<>();
+        if(descuentoFijo) ids.add("FIJO");
+        if(promocionEstudiante) ids.add("ESTUDIANTE");
+        ids.addAll(promocionesAdicionales); return java.util.Collections.unmodifiableSet(ids);
+    }
+    public void seleccionarPromocion(String id, boolean seleccionada) {
+        quitarPuntos();
+        if(id.equals("FIJO")) descuentoFijo=seleccionada;
+        else if(id.equals("ESTUDIANTE")) promocionEstudiante=seleccionada;
+        else if(seleccionada) promocionesAdicionales.add(id); else promocionesAdicionales.remove(id);
+    }
+    public String descripcionPromociones() {
+        return catalogo.promocionesVigentes().stream().filter(p->getPromocionesSeleccionadas().contains(p.id()))
+                .map(p->p.valor("Nombre")+" ("+p.valor("Tipo")+" "+p.valor("Valor")+")")
+                .collect(java.util.stream.Collectors.joining(", "));
     }
 
     public BigDecimal calcularTotalAPagar() {

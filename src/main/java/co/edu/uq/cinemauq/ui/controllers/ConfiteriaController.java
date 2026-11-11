@@ -64,34 +64,7 @@ public class ConfiteriaController implements Initializable {
     }
 
     private void cargarProductos() {
-        productosDisponibles = new ArrayList<>();
-
-        // Productos individuales (precios en COP)
-        productosDisponibles.add(new Producto("Palomitas", 32000.0));
-        productosDisponibles.add(new Producto("Refresco", 20000.0));
-        productosDisponibles.add(new Producto("Nachos", 40000.0));
-        productosDisponibles.add(new Producto("Hot Dog", 48000.0));
-        productosDisponibles.add(new Producto("Agua", 12000.0));
-        productosDisponibles.add(new Producto("Chocolates", 24000.0));
-
-        // Combos
-        Combo combo1 = new Combo("Combo Cine")
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Refresco", 20000.0));
-        productosDisponibles.add(combo1);
-
-        Combo combo2 = new Combo("Combo Familiar")
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Refresco", 20000.0))
-            .agregar(new Producto("Nachos", 40000.0));
-        productosDisponibles.add(combo2);
-
-        Combo combo3 = new Combo("Combo Deluxe")
-            .agregar(new Producto("Hot Dog", 48000.0))
-            .agregar(new Producto("Refresco", 20000.0))
-            .agregar(new Producto("Chocolates", 24000.0));
-        productosDisponibles.add(combo3);
+        productosDisponibles = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().confiteria();
 
         renderizarProductos();
     }
@@ -147,7 +120,7 @@ public class ConfiteriaController implements Initializable {
 
         Label descripcion = new Label(producto instanceof Combo combo
                 ? combo.getItems().stream().map(ItemCompra::getNombre).collect(java.util.stream.Collectors.joining(" + "))
-                : "Producto individual");
+                : co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().listar("Productos").stream().filter(p -> p.valor("Nombre").equals(producto.getNombre())).map(p -> p.valor("Descripción")).findFirst().orElse("Producto individual"));
         descripcion.setWrapText(true);
         descripcion.getStyleClass().add("product-description");
         javafx.scene.layout.Region espacio = new javafx.scene.layout.Region();

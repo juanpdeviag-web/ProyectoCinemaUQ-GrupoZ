@@ -57,11 +57,7 @@ public class CompraController implements Initializable {
     @FXML
     private Label totalLabel;
 
-    @FXML
-    private CheckBox chkDescuentoFijo;
-
-    @FXML
-    private CheckBox chkPromocion;
+    @FXML private VBox promocionesContainer;
 
     @FXML
     private Button btnConfirmar;
@@ -76,15 +72,27 @@ public class CompraController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        chkDescuentoFijo.setOnAction(event -> actualizarTotal());
-        chkPromocion.setOnAction(event -> actualizarTotal());
+
+
     }
 
     public void cargarDatos(SesionCompra sesionCompra) {
         this.sesionCompra = sesionCompra;
-        chkDescuentoFijo.setSelected(sesionCompra.isDescuentoFijo());
-        chkPromocion.setSelected(sesionCompra.isPromocionEstudiante());
+        cargarPromociones();
         mostrarResumen();
+    }
+
+    private void cargarPromociones() {
+        promocionesContainer.getChildren().clear();
+        for (var p : co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().promocionesVigentes()) {
+            CheckBox opcion = new CheckBox(p.valor("Nombre") + " · " + p.valor("Valor")
+                    + (p.valor("Tipo").equals("FIJO") ? " COP" : " %"));
+            opcion.setWrapText(true);
+            opcion.setSelected(sesionCompra.getPromocionesSeleccionadas().contains(p.id()));
+            opcion.setOnAction(e -> { sesionCompra.seleccionarPromocion(p.id(), opcion.isSelected()); actualizarTotal(); });
+            promocionesContainer.getChildren().add(opcion);
+        }
+        if (promocionesContainer.getChildren().isEmpty()) promocionesContainer.getChildren().add(new Label("No hay promociones vigentes."));
     }
 
     private void mostrarResumen() {
@@ -134,7 +142,7 @@ public class CompraController implements Initializable {
 
     private void actualizarTotal() {
         if (sesionCompra == null) return;
-        sesionCompra.configurarPromociones(chkDescuentoFijo.isSelected(), chkPromocion.isSelected());
+
         if (sesionCompra.getPuntosAplicados() > 0 && Navegador.getUsuarioActual() instanceof co.edu.uq.cinemauq.core.domain.Cliente cliente) {
             try {
                 pagoCompra.prepararPuntos(cliente, sesionCompra, sesionCompra.getPuntosAplicados());

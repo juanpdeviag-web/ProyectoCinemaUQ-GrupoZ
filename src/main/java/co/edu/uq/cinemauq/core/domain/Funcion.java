@@ -27,6 +27,15 @@ public class Funcion {
         return id;
     }
 
+    /** Conserva el identificador al editar una función futura sin ventas. */
+    public void reprogramar(Pelicula pelicula, Sala sala, LocalDateTime fechaHora) {
+        if (pelicula == null || sala == null || fechaHora == null || !fechaHora.isAfter(LocalDateTime.now()))
+            throw new FuncionException("La función debe tener película, sala y fecha futura");
+        this.pelicula = pelicula;
+        this.sala = sala;
+        this.fechaHora = fechaHora;
+    }
+
     public Pelicula getPelicula() { return pelicula; }
 
 

@@ -123,7 +123,7 @@ public class FuncionesController implements Initializable {
         capacidadLabel.getStyleClass().add("funcion-capacidad");
 
         fechaLabel.setWrapText(true);
-        Label precioLabel = new Label(String.format("Entrada: COP $%,.0f", sesionCompra.getPrecioEntrada()));
+        Label precioLabel = new Label(String.format("Entrada: COP $%,.0f", co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().precio(funcion)));
         precioLabel.getStyleClass().add("function-price");
         Button seleccionar = new Button("Seleccionar función");
         seleccionar.getStyleClass().add("boton-principal");
@@ -144,6 +144,7 @@ public class FuncionesController implements Initializable {
      */
     private void onSeleccionarFuncion(Funcion funcion) {
         sesionCompra.setFuncionSeleccionada(funcion);
+        sesionCompra.setPrecioEntrada(co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().precio(funcion));
         System.out.println("Función seleccionada: " +
             FuncionesGenerator.formatearFechaHora(funcion.getFechaHora()) +
             " - Sala: " + funcion.getSala().getNumero());

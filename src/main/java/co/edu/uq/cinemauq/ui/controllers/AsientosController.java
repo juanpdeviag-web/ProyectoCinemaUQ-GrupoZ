@@ -131,9 +131,13 @@ public class AsientosController implements Initializable {
     private Button crearBotonAsiento(String idAsiento, int fila, int columna) {
         Button btn = new Button(idAsiento);
         btn.getStyleClass().add("asiento");
+        var catalogo = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance();
+        boolean habilitado = catalogo.asientoHabilitado(sesionCompra.getFuncionSeleccionada(), idAsiento);
+        boolean accesible = catalogo.accesible(sesionCompra.getFuncionSeleccionada(), idAsiento);
+        if (accesible) btn.getStyleClass().add("asiento-accesible");
 
         // Determinar estado del asiento
-        if (asientosOcupados.contains(idAsiento)) {
+        if (!habilitado || asientosOcupados.contains(idAsiento)) {
             btn.getStyleClass().add("asiento-ocupado");
             btn.setDisable(true);
         } else if (sesionCompra.getAsientosSeleccionados().contains(idAsiento)) {
@@ -174,11 +178,15 @@ public class AsientosController implements Initializable {
     }
 
     private void actualizarIndicadorAsiento(Button boton, String id) {
-        String estado = asientosOcupados.contains(id) ? "Ocupado"
+        var catalogo = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance();
+        boolean habilitado = catalogo.asientoHabilitado(sesionCompra.getFuncionSeleccionada(), id);
+        boolean accesible = catalogo.accesible(sesionCompra.getFuncionSeleccionada(), id);
+        String estado = !habilitado ? "Deshabilitado" : asientosOcupados.contains(id) ? "Ocupado"
                 : sesionCompra.getAsientosSeleccionados().contains(id) ? "Seleccionado" : "Disponible";
-        boton.setText(id + (estado.equals("Ocupado") ? " ×" : estado.equals("Seleccionado") ? " ✓" : ""));
-        boton.setAccessibleText("Asiento " + id + ": " + estado);
-        boton.setTooltip(new javafx.scene.control.Tooltip("Asiento " + id + " · " + estado));
+        boton.setText(id + (!habilitado || estado.equals("Ocupado") ? " ×" : estado.equals("Seleccionado") ? " ✓" : "") + (accesible ? " ♿" : ""));
+        String descripcion = "Asiento " + id + " · " + estado + (accesible ? " · Accesible" : "");
+        boton.setAccessibleText(descripcion);
+        boton.setTooltip(new javafx.scene.control.Tooltip(descripcion));
     }
 
     /**
