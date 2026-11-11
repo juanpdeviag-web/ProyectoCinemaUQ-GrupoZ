@@ -88,4 +88,27 @@ public class Cliente extends Usuario {
                 .reduce(0, Math::addExact);
     }
 
+    /** Revierte saldo, historial y lotes si falla una confirmación de pago en memoria. */
+    public synchronized <T> T ejecutarPagoAtomico(java.util.function.Supplier<T> operacion) {
+        TarjetaVirtual tarjetaOriginal = tarjeta;
+        synchronized (tarjetaOriginal) {
+            TarjetaVirtual.Respaldo respaldoTarjeta = tarjetaOriginal.respaldar();
+            List<PuntoCinemaUQ> lotesOriginales = new ArrayList<>(puntosAcumulados);
+            List<PuntoCinemaUQ.Respaldo> respaldos = lotesOriginales.stream()
+                    .map(PuntoCinemaUQ::respaldar).toList();
+            try {
+                return operacion.get();
+            } catch (RuntimeException | Error fallo) {
+                tarjeta = tarjetaOriginal;
+                tarjetaOriginal.restaurar(respaldoTarjeta);
+                puntosAcumulados.clear();
+                puntosAcumulados.addAll(lotesOriginales);
+                for (int i = 0; i < lotesOriginales.size(); i++) {
+                    lotesOriginales.get(i).restaurar(respaldos.get(i));
+                }
+                throw fallo;
+            }
+        }
+    }
+
 }

@@ -7,9 +7,9 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
+
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -34,22 +34,11 @@ public class MisTicketsController implements Initializable {
     @FXML
     private Button btnVolver;
 
-    @FXML
-    private Button btnSalir;
-
-    @FXML
-    private VBox perfilContainer;
-
-    @FXML
-    private Label perfilNombreLabel;
-
-    @FXML
-    private Label perfilRolLabel;
-
-    @Override
+@Override
     public void initialize(URL location, ResourceBundle resources) {
+        sinTicketsLabel.managedProperty().bind(sinTicketsLabel.visibleProperty());
         cargarTickets();
-        configurarMenuPerfil();
+
     }
 
     private void cargarTickets() {
@@ -62,12 +51,7 @@ public class MisTicketsController implements Initializable {
         }
 
         // Actualizar header
-        perfilNombreLabel.setText(usuarioActual.getNombre());
-        if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Administrador) {
-            perfilRolLabel.setText("Rol: Administrador");
-        } else {
-            perfilRolLabel.setText("Rol: Cliente");
-        }
+
 
         // Obtener reservas del usuario
         List<ReservaAsiento> reservas = ReservasManager.getInstance().getReservasPorUsuario(usuarioActual.getId());
@@ -93,37 +77,44 @@ public class MisTicketsController implements Initializable {
 
             VBox ticketCard = new VBox();
             ticketCard.setSpacing(10);
-            ticketCard.setStyle("-fx-background-color: #FAF8F5; -fx-background-radius: 10; -fx-padding: 15; -fx-border-color: #C4A77D; -fx-border-radius: 10; -fx-border-width: 1;");
+            ticketCard.getStyleClass().add("card");
 
             Label peliculaLabel = new Label("🎬 " + primera.getPeliculaTitulo());
-            peliculaLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #4A3F35;");
+            peliculaLabel.getStyleClass().add("card-title");
 
             Label fechaLabel = new Label("📅 " + primera.getFechaFuncion().format(fechaFormatter));
-            fechaLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+            fechaLabel.getStyleClass().add("helper-text");
 
             Label salaLabel = new Label("🏢 Sala " + primera.getSalaNumero());
-            salaLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+            salaLabel.getStyleClass().add("helper-text");
 
             String asientos = reservasGrupo.stream()
                 .map(ReservaAsiento::getAsientoId)
                 .sorted()
                 .collect(Collectors.joining(", "));
             Label asientosLabel = new Label("💺 Asientos: " + asientos);
-            asientosLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8B7355;");
+            asientosLabel.getStyleClass().add("helper-text");
 
             double total = reservasGrupo.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
             Label totalLabel = new Label("💰 Total: COP $" + String.format("%,.0f", total));
-            totalLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #C4A77D;");
+            totalLabel.getStyleClass().add("stat-value");
 
-            Label verDetalleLabel = new Label("👁️ Ver detalle");
-            verDetalleLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #4A3F35; -fx-underline: true; -fx-cursor: hand;");
-            verDetalleLabel.setOnMouseClicked(event -> verDetalleTicket(reservasGrupo));
+            Button verDetalleLabel = new Button("Ver detalle");
+            verDetalleLabel.getStyleClass().add("boton-secundario");
+            verDetalleLabel.setOnAction(event -> verDetalleTicket(reservasGrupo));
 
-            Label cancelarLabel = new Label("❌ Cancelar compra");
-            cancelarLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #E74C3C; -fx-underline: true; -fx-cursor: hand;");
-            cancelarLabel.setOnMouseClicked(event -> onCancelarCompras());
+            Button cancelarLabel = new Button("Opciones de cancelación");
+            cancelarLabel.getStyleClass().add("boton-peligro");
+            cancelarLabel.setOnAction(event -> onCancelarCompras());
 
             ticketCard.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, verDetalleLabel, cancelarLabel);
+            Label estado = new Label(primera.getFechaFuncion().isBefore(java.time.LocalDateTime.now())
+                    ? "Estado: función realizada" : "Estado: próxima función");
+            estado.getStyleClass().add("estado-activo");
+            ticketCard.getChildren().add(1, estado);
+            for (javafx.scene.Node nodo : ticketCard.getChildren()) {
+                if (nodo instanceof Label etiqueta) etiqueta.setWrapText(true);
+            }
             ticketsContainer.getChildren().add(ticketCard);
         }
     }
@@ -134,62 +125,12 @@ public class MisTicketsController implements Initializable {
         Navegador.navegarA("/ui/views/ticket.fxml", "CinemaUQ - Ticket de Compra");
     }
 
-    private void configurarMenuPerfil() {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
-        miCuentaItem.setOnAction(event -> onMiCuenta());
-
-        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
-        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
-
-        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
-        misTicketsItem.setOnAction(event -> onMisTickets());
-
-        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
-        carteleraItem.setOnAction(event -> onIrACartelera());
-
-        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
-
-        perfilContainer.setOnMouseClicked(event -> {
-            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
-        });
-    }
-
-    @FXML
+@FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
 
-    @FXML
-    private void onSalir() {
-        System.exit(0);
-    }
-
-    @FXML
-    private void onMiCuenta() {
-        Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
-    }
-
-    @FXML
-    private void onTarjetaVirtual() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Cliente) {
-            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
-        }
-    }
-
-    @FXML
-    private void onMisTickets() {
-        // Ya estamos en Mis Tickets
-    }
-
-    @FXML
-    private void onIrACartelera() {
-        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
-    }
-
-    @FXML
+@FXML
     private void onCancelarCompras() {
         Navegador.navegarA("/ui/views/cancelaciones.fxml", "CinemaUQ - Cancelación de Compras");
     }

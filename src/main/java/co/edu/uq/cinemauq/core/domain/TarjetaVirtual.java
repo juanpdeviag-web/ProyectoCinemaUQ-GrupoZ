@@ -181,6 +181,20 @@ public class TarjetaVirtual {
         this.fechaUltimaActividad = LocalDateTime.now();
     }
 
+    record Respaldo(double saldo, boolean activa, LocalDateTime ultimaActividad, List<Transaccion> historial) { }
+
+    Respaldo respaldar() {
+        return new Respaldo(saldo, activa, fechaUltimaActividad, new ArrayList<>(historialTransacciones));
+    }
+
+    void restaurar(Respaldo respaldo) {
+        saldo = respaldo.saldo();
+        activa = respaldo.activa();
+        fechaUltimaActividad = respaldo.ultimaActividad();
+        historialTransacciones.clear();
+        historialTransacciones.addAll(respaldo.historial());
+    }
+
     private String generarNumeroTarjeta() {
         return "TV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }

@@ -1,26 +1,24 @@
 package co.edu.uq.cinemauq.ui.controllers;
 
-import co.edu.uq.cinemauq.core.domain.Administrador;
-import co.edu.uq.cinemauq.core.domain.Cliente;
 import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.core.domain.Pelicula;
-import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.core.seed.DataSeeder;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
+
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,22 +31,14 @@ public class CarteleraController {
     private TilePane peliculasTilePane;
 
     @FXML
-    private Label perfilNombreLabel;
-
-    @FXML
-    private Label perfilRolLabel;
-
-    @FXML
     private Label contadorPeliculas;
 
     @FXML
-    private Button btnLogin;
-
-    @FXML
-    private Button btnAdminPanel;
-
-    @FXML
-    private VBox perfilContainer;
+    private Label sinPeliculasLabel;
+    @FXML private GridPane filtrosGrid;
+    @FXML private VBox busquedaFiltro;
+    @FXML private VBox generoFiltro;
+    @FXML private VBox ordenFiltro;
 
     @FXML
     private TextField searchField;
@@ -61,7 +51,7 @@ public class CarteleraController {
 
     private SesionCompra sesionCompra;
     private List<Pelicula> todasLasPeliculas;
-    
+
     /**
      * Inicializa el controlador. Carga las películas desde DataSeeder
      * y las muestra en la interfaz.
@@ -71,75 +61,51 @@ public class CarteleraController {
         // Usar la sesión de Navegador en lugar de crear una nueva
         this.sesionCompra = Navegador.getSesionCompra();
         cargarPeliculas();
-        actualizarPerfil();
+
         inicializarFiltros();
         configurarListeners();
-        configurarMenuPerfil();
+        configurarDistribucion();
     }
 
     /**
-     * Configura el menú contextual del perfil de usuario.
+     * Adapta únicamente la distribución visual al espacio disponible.
      */
-    private void configurarMenuPerfil() {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
-        miCuentaItem.setOnAction(event -> onMiCuenta());
-
-        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
-        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
-
-        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
-        misTicketsItem.setOnAction(event -> onMisTickets());
-
-        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
-        carteleraItem.setOnAction(event -> onIrACartelera());
-
-        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
-
-        perfilContainer.setOnMouseClicked(event -> {
-            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
+    private void configurarDistribucion() {
+        filtrosGrid.widthProperty().addListener((obs, anterior, ancho) -> distribuirFiltros(ancho.doubleValue()));
+        distribuirFiltros(filtrosGrid.getWidth());
+        peliculasTilePane.widthProperty().addListener((obs, anterior, ancho) -> {
+            double espacio = ancho.doubleValue();
+            if (espacio > 0) {
+                int columnas = Math.max(1, Math.min(4, (int) ((espacio + 24) / (250 + 24))));
+                peliculasTilePane.setPrefColumns(columnas);
+                // Dejar margen al redondeo de píxeles para no perder una columna.
+                peliculasTilePane.setPrefTileWidth(Math.floor((espacio - (columnas - 1) * 24) / columnas) - 1);
+            }
         });
+    }
+
+    private void distribuirFiltros(double ancho) {
+        boolean vertical = ancho < 760;
+        filtrosGrid.getColumnConstraints().clear();
+        for (double porcentaje : vertical ? new double[]{100} : new double[]{44, 28, 28}) {
+            ColumnConstraints columna = new ColumnConstraints();
+            columna.setPercentWidth(porcentaje);
+            columna.setHgrow(Priority.ALWAYS);
+            filtrosGrid.getColumnConstraints().add(columna);
+        }
+        VBox[] filtros = {busquedaFiltro, generoFiltro, ordenFiltro};
+        for (int i = 0; i < filtros.length; i++) {
+            GridPane.setColumnIndex(filtros[i], vertical ? 0 : i);
+            GridPane.setRowIndex(filtros[i], vertical ? i : 0);
+        }
     }
 
     /**
      * Actualiza la información del perfil de usuario en la interfaz.
      * Muestra el nombre y rol si hay un usuario logueado.
      */
-    private void actualizarPerfil() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
 
-        if (usuarioActual != null) {
-            // Mostrar información del usuario
-            perfilNombreLabel.setText(usuarioActual.getNombre());
 
-            if (usuarioActual instanceof Administrador) {
-                perfilRolLabel.setText("Rol: Administrador");
-                perfilRolLabel.setStyle("-fx-text-fill: #8B7355;");
-                // Mostrar botón de admin panel
-                btnAdminPanel.setVisible(true);
-                btnAdminPanel.setManaged(true);
-            } else if (usuarioActual instanceof Cliente) {
-                perfilRolLabel.setText("Rol: Cliente");
-                perfilRolLabel.setStyle("-fx-text-fill: #8B7355;");
-                // Ocultar botón de admin panel
-                btnAdminPanel.setVisible(false);
-                btnAdminPanel.setManaged(false);
-            }
-
-            // Cambiar botón de login a cerrar sesión
-            btnLogin.setText("Cerrar Sesión");
-        } else {
-            // Ocultar información del perfil
-            perfilNombreLabel.setText("");
-            perfilRolLabel.setText("");
-            btnLogin.setText("Log In");
-            // Ocultar botón de admin panel
-            btnAdminPanel.setVisible(false);
-            btnAdminPanel.setManaged(false);
-        }
-    }
-    
     /**
      * Carga las películas desde DataSeeder y crea las tarjetas visuales.
      */
@@ -154,6 +120,8 @@ public class CarteleraController {
      */
     private void mostrarPeliculas(List<Pelicula> peliculas) {
         peliculasTilePane.getChildren().clear();
+        sinPeliculasLabel.setVisible(peliculas.isEmpty());
+        sinPeliculasLabel.setManaged(peliculas.isEmpty());
         for (Pelicula pelicula : peliculas) {
             VBox peliculaCard = crearTarjetaPelicula(pelicula);
             peliculasTilePane.getChildren().add(peliculaCard);
@@ -240,7 +208,7 @@ public class CarteleraController {
         mostrarPeliculas(filtradas);
         actualizarContador(filtradas.size());
     }
-    
+
     /**
      * Crea una tarjeta visual para una película.
      */
@@ -263,14 +231,27 @@ public class CarteleraController {
         Label duracionLabel = new Label("⏱ " + pelicula.getDuracionMinutos() + " min");
         duracionLabel.getStyleClass().add("pelicula-duracion");
 
-        card.getChildren().addAll(iconoLabel, tituloLabel, generoLabel, duracionLabel);
+        Button verFunciones = new Button("Ver funciones");
+        verFunciones.getStyleClass().add("boton-principal");
+        verFunciones.setMaxWidth(Double.MAX_VALUE);
+        verFunciones.setOnAction(event -> onSeleccionarPelicula(pelicula));
+        Region espacio = new Region();
+        VBox.setVgrow(espacio, Priority.ALWAYS);
+        card.getChildren().addAll(iconoLabel, tituloLabel, generoLabel, duracionLabel, espacio, verFunciones);
 
         // Al hacer clic en la tarjeta, seleccionar la película
-        card.setOnMouseClicked(event -> onSeleccionarPelicula(pelicula));
+        card.setOnMouseClicked(event -> {
+            javafx.scene.Node origen = (javafx.scene.Node) event.getTarget();
+            while (origen != null && origen != card) {
+                if (origen instanceof Button) return;
+                origen = origen.getParent();
+            }
+            onSeleccionarPelicula(pelicula);
+        });
 
         return card;
     }
-    
+
     /**
      * Maneja la selección de una película.
      * Verifica si hay usuario logueado antes de permitir la selección.
@@ -290,7 +271,7 @@ public class CarteleraController {
         System.out.println("Película seleccionada: " + pelicula.getTitulo() + " por " + usuarioActual.getNombre());
         Navegador.navegarA("/ui/views/funciones.fxml", "CinemaUQ - Funciones de " + pelicula.getTitulo());
     }
-    
+
     /**
      * Maneja el botón de salir.
      * Cierra la aplicación.
@@ -304,79 +285,32 @@ public class CarteleraController {
      * Maneja el botón de login/cerrar sesión.
      * Si hay usuario logueado, cierra sesión. Si no, navega a login.
      */
-    @FXML
-    private void onLogin() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
 
-        if (usuarioActual != null) {
-            // Cerrar sesión
-            Navegador.cerrarSesion();
-            System.out.println("Sesión cerrada para: " + usuarioActual.getNombre());
-            // Recargar la vista para actualizar el perfil
-            Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
-        } else {
-            // Navegar a login
-            Navegador.navegarA("/ui/views/login.fxml", "CinemaUQ - Iniciar Sesión");
-        }
-    }
 
     /**
      * Maneja el botón de panel de administrador.
      * Solo visible para usuarios con rol de administrador.
      */
-    @FXML
-    private void onAdminPanel() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
 
-        if (usuarioActual instanceof Administrador) {
-            Navegador.navegarA("/ui/views/admin_panel.fxml", "CinemaUQ - Panel de Administrador");
-        } else {
-            System.out.println("Acceso denegado: Solo administradores pueden acceder al panel.");
-        }
-    }
 
     /**
      * Maneja la opción "Mi Cuenta" del menú del perfil.
      */
-    @FXML
-    private void onMiCuenta() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual != null) {
-            Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
-        }
-    }
 
     /**
      * Maneja la opción "Tarjeta Virtual" del menú del perfil.
      */
-    @FXML
-    private void onTarjetaVirtual() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual instanceof Cliente) {
-            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
-        } else {
-            System.out.println("Solo los clientes tienen tarjeta virtual.");
-        }
-    }
+
 
     /**
      * Maneja la opción "Mis Tickets" del menú del perfil.
      */
-    @FXML
-    private void onMisTickets() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual != null) {
-            Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
-        }
-    }
+
 
     /**
      * Maneja la opción "Ir a Cartelera" del menú del perfil.
      */
-    @FXML
-    private void onIrACartelera() {
-        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
-    }
+
 
     /**
      * Obtiene la sesión de compra actual.

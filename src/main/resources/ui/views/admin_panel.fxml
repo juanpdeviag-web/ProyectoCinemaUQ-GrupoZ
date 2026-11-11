@@ -1,189 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uq.cinemauq.ui.controllers.AdminPanelController"
-            stylesheets="@../styles/estilos.css"
-            styleClass="root">
-
-    <top>
-        <VBox styleClass="header">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Label fx:id="adminLabel" text="Panel de Administrador" styleClass="title">
-                <font>
-                    <Font name="Arial Bold" size="26"/>
-                </font>
-            </Label>
-            <Label text="Gestión de películas, precios y clientes" styleClass="subtitle">
-                <font>
-                    <Font name="Arial" size="14"/>
-                </font>
-            </Label>
-        </VBox>
-    </top>
-
-    <center>
-        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
-            <Tab fx:id="tabPeliculas" text="Gestión de Películas">
-                <VBox spacing="20" styleClass="content">
-                    <padding>
-                        <Insets top="20" right="20" bottom="20" left="20"/>
-                    </padding>
-                    
-                    <HBox spacing="20">
-                        <VBox spacing="10" styleClass="resumen-container" HBox.hgrow="ALWAYS">
-                            <padding>
-                                <Insets top="15" right="15" bottom="15" left="15"/>
-                            </padding>
-                            <Label text="Lista de Películas:" styleClass="section-title">
-                                <font>
-                                    <Font name="Arial Bold" size="16"/>
-                                </font>
-                            </Label>
-                            <ListView fx:id="peliculasListView" prefHeight="400"/>
-                        </VBox>
-                        
-                        <VBox spacing="15" styleClass="resumen-container" prefWidth="400">
-                            <padding>
-                                <Insets top="15" right="15" bottom="15" left="15"/>
-                            </padding>
-                            <Label text="Agregar/Editar Película:" styleClass="section-title">
-                                <font>
-                                    <Font name="Arial Bold" size="16"/>
-                                </font>
-                            </Label>
-                            <VBox spacing="10">
-                                <Label text="Título:" styleClass="resumen-label"/>
-                                <TextField fx:id="tituloTextField" promptText="Título de la película"/>
-                            </VBox>
-                            <VBox spacing="10">
-                                <Label text="Género:" styleClass="resumen-label"/>
-                                <TextField fx:id="generoTextField" promptText="Género de la película"/>
-                            </VBox>
-                            <VBox spacing="10">
-                                <Label text="Duración (min):" styleClass="resumen-label"/>
-                                <TextField fx:id="duracionTextField" promptText="Duración en minutos"/>
-                            </VBox>
-                            <HBox spacing="10">
-                                <Button fx:id="btnAgregarPelicula" text="Agregar" onAction="#onAgregarPelicula" styleClass="button-primary" HBox.hgrow="ALWAYS"/>
-                                <Button fx:id="btnEliminarPelicula" text="Eliminar" onAction="#onEliminarPelicula" styleClass="button-secondary" HBox.hgrow="ALWAYS"/>
-                            </HBox>
-                        </VBox>
-                    </HBox>
-                </VBox>
-            </Tab>
-            
-            <Tab fx:id="tabPrecios" text="Ajustar Precios">
-                <VBox spacing="20" styleClass="content">
-                    <padding>
-                        <Insets top="20" right="20" bottom="20" left="20"/>
-                    </padding>
-                    
-                    <VBox spacing="15" styleClass="resumen-container" maxWidth="600">
-                        <padding>
-                            <Insets top="20" right="20" bottom="20" left="20"/>
-                        </padding>
-                        <Label text="Configuración de Precios:" styleClass="section-title">
-                            <font>
-                                <Font name="Arial Bold" size="18"/>
-                            </font>
-                        </Label>
-                        
-                        <VBox spacing="10">
-                            <Label text="Precio de Entrada (COP $):" styleClass="resumen-label"/>
-                            <HBox spacing="10">
-                                <TextField fx:id="precioEntradaTextField" prefWidth="200"/>
-                                <Button fx:id="btnActualizarPrecioEntrada" text="Actualizar" onAction="#onActualizarPrecioEntrada" styleClass="button-primary"/>
-                            </HBox>
-                        </VBox>
-
-                        <VBox spacing="10">
-                            <Label text="Precio de Palomitas (COP $):" styleClass="resumen-label"/>
-                            <HBox spacing="10">
-                                <TextField fx:id="precioPalomitasTextField" prefWidth="200"/>
-                                <Button fx:id="btnActualizarPrecioPalomitas" text="Actualizar" onAction="#onActualizarPrecioPalomitas" styleClass="button-primary"/>
-                            </HBox>
-                        </VBox>
-
-                        <VBox spacing="10">
-                            <Label text="Precio de Refresco (COP $):" styleClass="resumen-label"/>
-                            <HBox spacing="10">
-                                <TextField fx:id="precioRefrescoTextField" prefWidth="200"/>
-                                <Button fx:id="btnActualizarPrecioRefresco" text="Actualizar" onAction="#onActualizarPrecioRefresco" styleClass="button-primary"/>
-                            </HBox>
-                        </VBox>
-                    </VBox>
-                </VBox>
-            </Tab>
-            
-            <Tab fx:id="tabClientes" text="Ver Clientes y Compras">
-                <VBox spacing="20" styleClass="content">
-                    <padding>
-                        <Insets top="20" right="20" bottom="20" left="20"/>
-                    </padding>
-                    
-                    <HBox spacing="20">
-                        <VBox spacing="10" styleClass="resumen-container" HBox.hgrow="ALWAYS">
-                            <padding>
-                                <Insets top="15" right="15" bottom="15" left="15"/>
-                            </padding>
-                            <Label text="Lista de Clientes:" styleClass="section-title">
-                                <font>
-                                    <Font name="Arial Bold" size="16"/>
-                                </font>
-                            </Label>
-                            <ListView fx:id="clientesListView" prefHeight="400"/>
-                        </VBox>
-                        
-                        <VBox spacing="15" styleClass="resumen-container" prefWidth="500">
-                            <padding>
-                                <Insets top="15" right="15" bottom="15" left="15"/>
-                            </padding>
-                            <Label text="Información del Cliente:" styleClass="section-title">
-                                <font>
-                                    <Font name="Arial Bold" size="16"/>
-                                </font>
-                            </Label>
-                            <VBox fx:id="clienteInfoBox" spacing="10">
-                                <Label fx:id="clienteNombreLabel" text="Nombre: -" styleClass="resumen-label"/>
-                                <Label fx:id="clienteEmailLabel" text="Email: -" styleClass="resumen-label"/>
-                                <Label fx:id="clienteSaldoLabel" text="Saldo: -" styleClass="resumen-label"/>
-                            </VBox>
-                            <Label text="Historial de Compras:" styleClass="section-title">
-                                <font>
-                                    <Font name="Arial Bold" size="16"/>
-                                </font>
-                            </Label>
-                            <ListView fx:id="comprasListView" prefHeight="200"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-            </Tab>
-        </TabPane>
-    </center>
-
-    <bottom>
-        <HBox alignment="CENTER" spacing="20" styleClass="footer">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
-            <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#onCerrarSesion" styleClass="button-primary"/>
-        </HBox>
-    </bottom>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Group?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.AdminPanelController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page">
+ <top><EncabezadoCinema titulo="Administración CinemaUQ" subtitulo="Gestiona el catálogo, los precios y la consulta de clientes." activa="admin_panel"/></top>
+ <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><VBox styleClass="content-container" alignment="TOP_CENTER">
+  <VBox maxWidth="1300" spacing="20" alignment="TOP_CENTER" styleClass="app-container">
+<Label fx:id="adminLabel" text="Panel de administración" styleClass="section-title" wrapText="true"/>
+<FlowPane hgap="16" vgap="16" alignment="CENTER">
+ <VBox styleClass="stat-card" spacing="10"><Label text="Películas registradas" styleClass="stat-label"/><Label fx:id="totalPeliculasLabel" text="0" styleClass="stat-value"/></VBox>
+ <VBox styleClass="stat-card" spacing="10"><Label text="Clientes registrados" styleClass="stat-label"/><Label fx:id="totalClientesLabel" text="0" styleClass="stat-value"/></VBox>
+</FlowPane>
+<Label fx:id="mensajeAdminLabel" text="Selecciona un área para comenzar." wrapText="true" styleClass="mensaje-info"/>
+<TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" prefHeight="900" minWidth="0">
+ <tabs>
+  <Tab fx:id="tabPeliculas" text="Películas"><VBox spacing="16" styleClass="tab-content">
+   <Label text="Catálogo de películas" styleClass="section-title"/>
+   <ListView fx:id="peliculasListView" prefHeight="230"/>
+   <VBox spacing="10" styleClass="form-card">
+    <Label text="Agregar película" styleClass="section-title"/>
+    <Label text="Seleccionar una película permite consultar sus datos. Agregar crea un nuevo registro." wrapText="true" styleClass="helper-text"/>
+    <Label text="Título" labelFor="$tituloTextField" styleClass="form-label"/><TextField fx:id="tituloTextField" styleClass="form-field"/>
+    <Label text="Género" labelFor="$generoTextField" styleClass="form-label"/><TextField fx:id="generoTextField" styleClass="form-field"/>
+    <Label text="Duración en minutos" labelFor="$duracionTextField" styleClass="form-label"/><TextField fx:id="duracionTextField" styleClass="form-field"/>
+    <FlowPane hgap="12" vgap="10">
+     <Button fx:id="btnAgregarPelicula" text="Agregar película" onAction="#onAgregarPelicula" styleClass="boton-principal"/>
+     <Button fx:id="btnEliminarPelicula" text="Eliminar seleccionada" onAction="#onEliminarPelicula" styleClass="boton-peligro"/>
+    </FlowPane>
+   </VBox>
+  </VBox></Tab>
+  <Tab fx:id="tabPrecios" text="Precios"><VBox spacing="16" styleClass="tab-content">
+   <Label text="Configuración de precios" styleClass="section-title"/>
+   <VBox spacing="12" styleClass="form-card">
+    <Label text="Entrada (COP)" labelFor="$precioEntradaTextField" styleClass="form-label"/>
+    <TextField fx:id="precioEntradaTextField" styleClass="form-field"/>
+    <Button fx:id="btnActualizarPrecioEntrada" text="Actualizar entrada" onAction="#onActualizarPrecioEntrada" styleClass="boton-principal"/>
+    <Separator/>
+    <Label text="Palomitas (COP)" labelFor="$precioPalomitasTextField" styleClass="form-label"/>
+    <TextField fx:id="precioPalomitasTextField" styleClass="form-field"/>
+    <Button fx:id="btnActualizarPrecioPalomitas" text="Actualizar palomitas" onAction="#onActualizarPrecioPalomitas" styleClass="boton-secundario"/>
+    <Separator/>
+    <Label text="Refresco (COP)" labelFor="$precioRefrescoTextField" styleClass="form-label"/>
+    <TextField fx:id="precioRefrescoTextField" styleClass="form-field"/>
+    <Button fx:id="btnActualizarPrecioRefresco" text="Actualizar refresco" onAction="#onActualizarPrecioRefresco" styleClass="boton-secundario"/>
+   </VBox>
+  </VBox></Tab>
+  <Tab fx:id="tabClientes" text="Clientes"><VBox spacing="16" styleClass="tab-content">
+   <Label text="Clientes registrados" styleClass="section-title"/>
+   <ListView fx:id="clientesListView" prefHeight="240"/>
+   <VBox fx:id="clienteInfoBox" spacing="10" styleClass="card">
+    <Label text="Datos del cliente seleccionado" styleClass="form-label"/>
+    <Label fx:id="clienteNombreLabel" text="Selecciona un cliente en la lista." wrapText="true"/>
+    <Label fx:id="clienteEmailLabel" wrapText="true"/><Label fx:id="clienteSaldoLabel" wrapText="true"/>
+   </VBox>
+   <Label text="Historial de demostración" styleClass="section-title"/>
+   <Label text="Los registros de ejemplo existentes no representan compras verificadas de este cliente." wrapText="true" styleClass="helper-text"/>
+   <ListView fx:id="comprasListView" prefHeight="220"/>
+  </VBox></Tab>
+ </tabs>
+</TabPane>
+  </VBox>
+ </VBox></ScrollPane></center>
+ <bottom><FlowPane styleClass="app-footer" alignment="CENTER" hgap="12" vgap="8">
+<Button fx:id="btnVolver" text="Volver a cartelera" onAction="#onVolver" styleClass="boton-secundario"/>
+<Button fx:id="btnCerrarSesion" text="Cerrar sesión" onAction="#onCerrarSesion" styleClass="boton-secundario"/>
+ </FlowPane></bottom>
 </BorderPane>

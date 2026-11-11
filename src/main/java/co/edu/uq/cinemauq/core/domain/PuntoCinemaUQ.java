@@ -53,4 +53,16 @@ public final class PuntoCinemaUQ {
         actualizarEstado();
         return estado;
     }
+
+    // Soporte interno de transacción; no altera las transiciones del patrón State.
+    record Respaldo(int cantidadRestante, EstadoPunto estado) { }
+
+    Respaldo respaldar() {
+        return new Respaldo(cantidadRestante, estado);
+    }
+
+    void restaurar(Respaldo respaldo) {
+        cantidadRestante = respaldo.cantidadRestante();
+        estado = respaldo.estado();
+    }
 }

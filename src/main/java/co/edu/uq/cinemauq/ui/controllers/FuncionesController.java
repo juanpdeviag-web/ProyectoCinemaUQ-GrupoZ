@@ -20,22 +20,22 @@ import java.util.ResourceBundle;
  * Muestra las funciones disponibles para la película seleccionada y permite elegir una.
  */
 public class FuncionesController implements Initializable {
-    
+
     @FXML
     private Label peliculaTituloLabel;
-    
+
     @FXML
     private Label peliculaInfoLabel;
-    
+
     @FXML
-    private VBox funcionesContainer;
-    
+    private javafx.scene.layout.FlowPane funcionesContainer;
+
     @FXML
     private Button btnVolver;
-    
+
     private SesionCompra sesionCompra;
     private List<Funcion> funciones;
-    
+
     /**
      * Inicializa el controlador.
      */
@@ -43,7 +43,7 @@ public class FuncionesController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // La inicialización se completa en cargarDatos()
     }
-    
+
     /**
      * Carga los datos de la película seleccionada y sus funciones.
      * Este método debe llamarse después de crear el controlador.
@@ -68,7 +68,7 @@ public class FuncionesController implements Initializable {
         // Generar y mostrar funciones
         cargarFunciones(pelicula);
     }
-    
+
     /**
      * Carga las funciones de la película y crea las tarjetas visuales.
      */
@@ -94,11 +94,11 @@ public class FuncionesController implements Initializable {
 
         if (funcionesContainer.getChildren().isEmpty()) {
             Label noFunciones = new Label("No hay funciones disponibles para esta película");
-            noFunciones.setStyle("-fx-text-fill: #a0a0a0;");
+            noFunciones.getStyleClass().add("empty-state");
             funcionesContainer.getChildren().add(noFunciones);
         }
     }
-    
+
     /**
      * Crea una tarjeta visual para una función.
      */
@@ -106,30 +106,38 @@ public class FuncionesController implements Initializable {
         VBox card = new VBox();
         card.getStyleClass().add("funcion-card");
         card.setSpacing(10);
-        
+
         // Fecha y hora formateada
         String fechaHora = FuncionesGenerator.formatearFechaHora(funcion.getFechaHora());
-        
+
         Label fechaLabel = new Label(fechaHora);
         fechaLabel.getStyleClass().add("funcion-fecha");
-        
+
         // Información de sala
         Label salaLabel = new Label("Sala: " + funcion.getSala().getNumero());
         salaLabel.getStyleClass().add("funcion-sala");
-        
+
         // Capacidad de la sala
         int capacidad = funcion.getSala().calcularCapacidad();
         Label capacidadLabel = new Label("Capacidad: " + capacidad + " asientos");
         capacidadLabel.getStyleClass().add("funcion-capacidad");
-        
-        card.getChildren().addAll(fechaLabel, salaLabel, capacidadLabel);
-        
+
+        fechaLabel.setWrapText(true);
+        Label precioLabel = new Label(String.format("Entrada: COP $%,.0f", sesionCompra.getPrecioEntrada()));
+        precioLabel.getStyleClass().add("function-price");
+        Button seleccionar = new Button("Seleccionar función");
+        seleccionar.getStyleClass().add("boton-principal");
+        seleccionar.setOnAction(event -> onSeleccionarFuncion(funcion));
+        javafx.scene.layout.Region espacio = new javafx.scene.layout.Region();
+        VBox.setVgrow(espacio, javafx.scene.layout.Priority.ALWAYS);
+        card.getChildren().addAll(fechaLabel, salaLabel, capacidadLabel, precioLabel, espacio, seleccionar);
+
         // Al hacer clic en la tarjeta, seleccionar la función
-        card.setOnMouseClicked(event -> onSeleccionarFuncion(funcion));
-        
+        // La acción explícita también permite seleccionar con el teclado.
+
         return card;
     }
-    
+
     /**
      * Maneja la selección de una función.
      * Guarda la función en la sesión de compra y navega a la pantalla de asientos.
@@ -150,7 +158,7 @@ public class FuncionesController implements Initializable {
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
-    
+
     /**
      * Obtiene la sesión de compra actual.
      */

@@ -26,85 +26,89 @@ import java.util.ResourceBundle;
  * Permite gestionar películas, precios y ver clientes.
  */
 public class AdminPanelController implements Initializable {
-    
+
     @FXML
     private Label adminLabel;
-    
+
+    @FXML private Label totalPeliculasLabel;
+    @FXML private Label totalClientesLabel;
+    @FXML private Label mensajeAdminLabel;
+
     @FXML
     private TabPane tabPane;
-    
+
     @FXML
     private Tab tabPeliculas;
-    
+
     @FXML
     private Tab tabPrecios;
-    
+
     @FXML
     private Tab tabClientes;
-    
+
     // Películas
     @FXML
     private ListView<Pelicula> peliculasListView;
-    
+
     @FXML
     private TextField tituloTextField;
-    
+
     @FXML
     private TextField generoTextField;
-    
+
     @FXML
     private TextField duracionTextField;
-    
+
     @FXML
     private Button btnAgregarPelicula;
-    
+
     @FXML
     private Button btnEliminarPelicula;
-    
+
     // Precios
     @FXML
     private TextField precioEntradaTextField;
-    
+
     @FXML
     private Button btnActualizarPrecioEntrada;
-    
+
     @FXML
     private TextField precioPalomitasTextField;
-    
+
     @FXML
     private Button btnActualizarPrecioPalomitas;
-    
+
     @FXML
     private TextField precioRefrescoTextField;
-    
+
     @FXML
     private Button btnActualizarPrecioRefresco;
-    
+
     // Clientes
     @FXML
     private ListView<Cliente> clientesListView;
-    
+
     @FXML
     private VBox clienteInfoBox;
-    
+
     @FXML
     private Label clienteNombreLabel;
-    
+
     @FXML
     private Label clienteEmailLabel;
-    
+
     @FXML
     private Label clienteSaldoLabel;
-    
+
     @FXML
     private ListView<String> comprasListView;
-    
+
     @FXML
     private Button btnCerrarSesion;
-    
+
     @FXML
     private Button btnVolver;
-    
+
     private Usuario usuarioActual;
     private List<Pelicula> peliculas;
     private List<Cliente> clientes;
@@ -113,40 +117,72 @@ public class AdminPanelController implements Initializable {
     private double precioEntrada = 60000.0; // $60,000 COP
     private double precioPalomitas = 32000.0; // $32,000 COP
     private double precioRefresco = 20000.0; // $20,000 COP
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cargarPeliculas();
         cargarClientes();
         cargarPrecios();
         configurarListeners();
+        peliculasListView.setCellFactory(lista -> new javafx.scene.control.ListCell<>() {
+            @Override protected void updateItem(Pelicula pelicula, boolean vacio) {
+                super.updateItem(pelicula, vacio);
+                setText(vacio || pelicula == null ? null : pelicula.getTitulo() + " · " + pelicula.getGenero() + " · " + pelicula.getDuracionMinutos() + " min");
+            }
+        });
+        clientesListView.setCellFactory(lista -> new javafx.scene.control.ListCell<>() {
+            @Override protected void updateItem(Cliente cliente, boolean vacio) {
+                super.updateItem(cliente, vacio);
+                setText(vacio || cliente == null ? null : cliente.getNombre() + " · " + cliente.getCorreo());
+            }
+        });
+        peliculasListView.getItems().addListener((javafx.collections.ListChangeListener<Pelicula>) cambio -> actualizarEstadisticas());
+        actualizarEstadisticas();
+        tabPane.prefHeightProperty().bind(javafx.beans.binding.Bindings.createDoubleBinding(() -> {
+            Tab seleccionada = tabPane.getSelectionModel().getSelectedItem();
+            if (seleccionada == null || !(seleccionada.getContent() instanceof javafx.scene.layout.Region contenido)) {
+                return 200.0;
+            }
+            return contenido.prefHeight(Math.max(0, tabPane.getWidth() - 40)) + 60;
+        }, tabPane.widthProperty(), tabPane.getSelectionModel().selectedItemProperty()));
     }
-    
+
+    private void actualizarEstadisticas() {
+        totalPeliculasLabel.setText(String.valueOf(peliculasListView.getItems().size()));
+        totalClientesLabel.setText(String.valueOf(clientesListView.getItems().size()));
+    }
+
+    private void mostrarMensaje(String texto, boolean exito) {
+        mensajeAdminLabel.setText(texto);
+        mensajeAdminLabel.getStyleClass().removeAll("mensaje-info", "mensaje-error", "mensaje-exito");
+        mensajeAdminLabel.getStyleClass().add(exito ? "mensaje-exito" : "mensaje-error");
+    }
+
     public void cargarDatos(Usuario usuario) {
         this.usuarioActual = usuario;
         if (usuario instanceof Administrador) {
             adminLabel.setText("Panel de Administrador: " + usuario.getNombre());
         }
     }
-    
+
     private void cargarPeliculas() {
         peliculas = DataSeeder.cargarPeliculas();
         peliculasListView.getItems().clear();
         peliculasListView.getItems().addAll(peliculas);
     }
-    
+
     private void cargarClientes() {
         clientes = UserSeeder.obtenerClientes();
         clientesListView.getItems().clear();
         clientesListView.getItems().addAll(clientes);
     }
-    
+
     private void cargarPrecios() {
         precioEntradaTextField.setText(String.valueOf(precioEntrada));
         precioPalomitasTextField.setText(String.valueOf(precioPalomitas));
         precioRefrescoTextField.setText(String.valueOf(precioRefresco));
     }
-    
+
     private void configurarListeners() {
         // Listener para selección de película
         peliculasListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -156,7 +192,7 @@ public class AdminPanelController implements Initializable {
                 duracionTextField.setText(String.valueOf(newVal.getDuracionMinutos()));
             }
         });
-        
+
         // Listener para selección de cliente
         clientesListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
@@ -164,7 +200,7 @@ public class AdminPanelController implements Initializable {
             }
         });
     }
-    
+
     private void mostrarInfoCliente(Cliente cliente) {
         clienteNombreLabel.setText("Nombre: " + cliente.getNombre());
         clienteEmailLabel.setText("Email: " + cliente.getCorreo());
@@ -176,35 +212,40 @@ public class AdminPanelController implements Initializable {
         comprasListView.getItems().add("El origen - Sala 2 - Asientos: B3 - COP $60,000.00");
         comprasListView.getItems().add("Confitería: Palomitas x2 - COP $64,000.00");
     }
-    
+
     @FXML
     private void onAgregarPelicula() {
         String titulo = tituloTextField.getText();
         String genero = generoTextField.getText();
         String duracionStr = duracionTextField.getText();
-        
+
         if (titulo.isEmpty() || genero.isEmpty() || duracionStr.isEmpty()) {
             System.err.println("Por favor completa todos los campos");
+            mostrarMensaje("Completa el título, género y duración.", false);
             return;
         }
-        
+
         try {
             int duracion = Integer.parseInt(duracionStr);
             Pelicula nuevaPelicula = new Pelicula(titulo, genero, duracion);
             peliculas.add(nuevaPelicula);
             peliculasListView.getItems().add(nuevaPelicula);
-            
+
             // Limpiar campos
             tituloTextField.clear();
             generoTextField.clear();
             duracionTextField.clear();
-            
+
             System.out.println("Película agregada: " + titulo);
+            mostrarMensaje("Película agregada: " + titulo, true);
         } catch (NumberFormatException e) {
             System.err.println("La duración debe ser un número");
+            mostrarMensaje("La duración debe ser un número entero.", false);
+        } catch (co.edu.uq.cinemauq.core.exceptions.CinemaUQException e) {
+            mostrarMensaje(e.getMessage(), false);
         }
     }
-    
+
     @FXML
     private void onEliminarPelicula() {
         Pelicula seleccionada = peliculasListView.getSelectionModel().getSelectedItem();
@@ -212,51 +253,59 @@ public class AdminPanelController implements Initializable {
             peliculas.remove(seleccionada);
             peliculasListView.getItems().remove(seleccionada);
             System.out.println("Película eliminada: " + seleccionada.getTitulo());
-            
+            mostrarMensaje("Película eliminada: " + seleccionada.getTitulo(), true);
+
             // Limpiar campos
             tituloTextField.clear();
             generoTextField.clear();
             duracionTextField.clear();
         } else {
             System.err.println("Selecciona una película para eliminar");
+            mostrarMensaje("Selecciona una película para eliminar.", false);
         }
     }
-    
+
     @FXML
     private void onActualizarPrecioEntrada() {
         try {
             precioEntrada = Double.parseDouble(precioEntradaTextField.getText());
             System.out.println("Precio de entrada actualizado: $" + precioEntrada);
+            mostrarMensaje("Precio de entrada actualizado en el panel.", true);
         } catch (NumberFormatException e) {
             System.err.println("Precio inválido");
+            mostrarMensaje("Escribe un precio numérico válido.", false);
         }
     }
-    
+
     @FXML
     private void onActualizarPrecioPalomitas() {
         try {
             precioPalomitas = Double.parseDouble(precioPalomitasTextField.getText());
             System.out.println("Precio de palomitas actualizado: $" + precioPalomitas);
+            mostrarMensaje("Precio de palomitas actualizado en el panel.", true);
         } catch (NumberFormatException e) {
             System.err.println("Precio inválido");
+            mostrarMensaje("Escribe un precio numérico válido.", false);
         }
     }
-    
+
     @FXML
     private void onActualizarPrecioRefresco() {
         try {
             precioRefresco = Double.parseDouble(precioRefrescoTextField.getText());
             System.out.println("Precio de refresco actualizado: $" + precioRefresco);
+            mostrarMensaje("Precio de refresco actualizado en el panel.", true);
         } catch (NumberFormatException e) {
             System.err.println("Precio inválido");
+            mostrarMensaje("Escribe un precio numérico válido.", false);
         }
     }
-    
+
     @FXML
     private void onCerrarSesion() {
         Navegador.cerrarSesion();
     }
-    
+
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
