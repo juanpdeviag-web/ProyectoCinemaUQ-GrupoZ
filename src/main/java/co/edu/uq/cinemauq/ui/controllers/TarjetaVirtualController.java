@@ -1,12 +1,9 @@
 package co.edu.uq.cinemauq.ui.controllers;
 
 import co.edu.uq.cinemauq.core.domain.Cliente;
-import co.edu.uq.cinemauq.core.domain.ReservaAsiento;
 import co.edu.uq.cinemauq.core.domain.TarjetaVirtual;
 import co.edu.uq.cinemauq.core.domain.Transaccion;
 import co.edu.uq.cinemauq.core.exceptions.TarjetaInactivaException;
-import co.edu.uq.cinemauq.core.managers.AsientosManager;
-import co.edu.uq.cinemauq.core.managers.ReservasManager;
 import co.edu.uq.cinemauq.ui.models.SesionCompra;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
@@ -20,10 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * Controlador para la pantalla de tarjeta virtual.
@@ -200,16 +195,8 @@ public class TarjetaVirtualController implements Initializable {
             if (!sesionCompra.tieneFuncionSeleccionada() || !sesionCompra.tieneAsientosSeleccionados()) {
                 throw new IllegalStateException("No hay una compra pendiente para pagar.");
             }
-            // Preparar las reservas antes de modificar saldo o puntos.
-            var funcion = sesionCompra.getFuncionSeleccionada();
-            Set<String> asientos = new HashSet<>(sesionCompra.getAsientosSeleccionados());
-            double total = sesionCompra.calcularTotalAPagar().doubleValue();
-            List<ReservaAsiento> nuevasReservas = asientos.stream().map(asiento -> new ReservaAsiento(
-                    cliente.getId(), cliente.getNombre(), funcion.getId(), funcion.getPelicula().getTitulo(),
-                    funcion.getSala().getNumero(), funcion.getFechaHora(), asiento, total / asientos.size())).toList();
+            // El servicio confirma dinero, puntos, compra, reservas y ocupación una sola vez.
             pagoCompra.pagar(cliente, sesionCompra);
-            AsientosManager.getInstance().marcarAsientosOcupados(funcion.getId(), asientos);
-            nuevasReservas.forEach(ReservasManager.getInstance()::agregarReserva);
             sesionCompra.limpiar();
             Navegador.navegarA("/ui/views/ticket.fxml", "CinemaUQ - Ticket de Compra");
         } catch (RuntimeException e) {

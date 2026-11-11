@@ -3,7 +3,7 @@ package co.edu.uq.cinemauq.ui.controllers;
 import co.edu.uq.cinemauq.core.domain.*;
 import co.edu.uq.cinemauq.core.exceptions.CompraException;
 import co.edu.uq.cinemauq.core.exceptions.ReembolsoDuplicadoException;
-import co.edu.uq.cinemauq.core.managers.ReservasManager;
+
 import co.edu.uq.cinemauq.services.CancelacionService;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
@@ -12,13 +12,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.time.Duration;
-import java.time.LocalDateTime;
+
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
+
 
 /**
  * Controlador para la pantalla de Cancelación de Compras.
@@ -37,7 +37,7 @@ public class CancelacionController implements Initializable {
     @FXML
     private Button btnVolver;
 
-private CancelacionService cancelacionService;
+    private CancelacionService cancelacionService;
     private DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
 
     @Override
@@ -49,113 +49,65 @@ private CancelacionService cancelacionService;
     }
 
     private void inicializarCancelacionService() {
-        cancelacionService = new CancelacionService(
-            Navegador.getUserRepository(),
-            Navegador.getPagoProcessor()
-        );
+        cancelacionService = new CancelacionService();
     }
 
     private void cargarCompras() {
         comprasContainer.getChildren().clear();
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-
-        if (usuarioActual == null) {
-            sinComprasLabel.setText("Debes iniciar sesión para ver tus compras");
+        Usuario usuario = Navegador.getUsuarioActual();
+        if (!(usuario instanceof Cliente)) {
+            sinComprasLabel.setText("Inicia sesión como cliente para consultar tus compras.");
             sinComprasLabel.setVisible(true);
             return;
         }
-
-
-        List<ReservaAsiento> reservas = ReservasManager.getInstance().getReservasPorUsuario(usuarioActual.getId());
-
-        if (reservas.isEmpty()) {
-            sinComprasLabel.setText("No tienes compras registradas");
-            sinComprasLabel.setVisible(true);
-            return;
-        }
-
-        sinComprasLabel.setVisible(false);
-
-        Map<String, List<ReservaAsiento>> reservasPorFuncion = reservas.stream()
-            .collect(Collectors.groupingBy(r -> r.getFuncionId()));
-
-        for (Map.Entry<String, List<ReservaAsiento>> entry : reservasPorFuncion.entrySet()) {
-            List<ReservaAsiento> reservasGrupo = entry.getValue();
-            ReservaAsiento primera = reservasGrupo.get(0);
-
-            VBox compraCard = crearTarjetaCompra(reservasGrupo);
-            comprasContainer.getChildren().add(compraCard);
-        }
+        List<CompraConfirmada> compras = cancelacionService.listarComprasPorCliente(usuario.getId());
+        sinComprasLabel.setVisible(compras.isEmpty());
+        for (CompraConfirmada compra : compras) comprasContainer.getChildren().add(crearTarjetaCompra(compra));
     }
 
-    private VBox crearTarjetaCompra(List<ReservaAsiento> reservas) {
-        ReservaAsiento primera = reservas.get(0);
-        String compraId = primera.getFuncionId();
-
-        VBox card = new VBox();
-        card.setSpacing(10);
+    private VBox crearTarjetaCompra(CompraConfirmada registro) {
+        var compra = registro.compra();
+        String compraId = compra.id();
+        VBox card = new VBox(10);
+        card.setUserData(compraId);
         card.getStyleClass().add("card");
-
-        Label peliculaLabel = new Label("🎬 " + primera.getPeliculaTitulo());
-        peliculaLabel.getStyleClass().add("card-title");
-
-        Label fechaLabel = new Label("📅 " + primera.getFechaFuncion().format(fechaFormatter));
-        fechaLabel.getStyleClass().add("helper-text");
-
-        Label salaLabel = new Label("🏢 Sala " + primera.getSalaNumero());
-        salaLabel.getStyleClass().add("helper-text");
-
-        String asientos = reservas.stream()
-            .map(ReservaAsiento::getAsientoId)
-            .sorted()
-            .collect(Collectors.joining(", "));
-        Label asientosLabel = new Label("💺 Asientos: " + asientos);
-        asientosLabel.getStyleClass().add("helper-text");
-
-        double total = reservas.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
-        Label totalLabel = new Label("💰 Total: COP $" + String.format("%,.0f", total));
-        totalLabel.getStyleClass().add("stat-value");
-
-        Label tiempoRestanteLabel = calcularTiempoRestante(primera.getFechaFuncion());
-        tiempoRestanteLabel.getStyleClass().add("helper-text");
-
-        Button btnCancelar = new Button("❌ Cancelar Compra");
-        btnCancelar.getStyleClass().add("boton-peligro");
-        btnCancelar.setOnAction(event -> mostrarDialogoCancelacion(compraId, primera.getPeliculaTitulo(), total));
-
-        card.getChildren().addAll(peliculaLabel, fechaLabel, salaLabel, asientosLabel, totalLabel, tiempoRestanteLabel, btnCancelar);
-        boolean reembolsada = cancelacionService.getHistorialReembolsos().stream()
-                .anyMatch(r -> r.idCompra().equals(compraId) && r.procesado());
-        long horas = Duration.between(LocalDateTime.now(), primera.getFechaFuncion()).toHours();
-        Label estado = new Label(reembolsada ? "REEMBOLSADO" : horas < 2 ? "NO CANCELABLE" : "CANCELABLE POR HORARIO");
-        estado.getStyleClass().add(reembolsada ? "estado-inactivo" : "estado-activo");
-        card.getChildren().add(1, estado);
-        btnCancelar.setDisable(reembolsada || horas < 2);
-        if (btnCancelar.isDisabled()) {
-            btnCancelar.setTooltip(new Tooltip(reembolsada ? "Compra reembolsada" : "Fuera del plazo de cancelación"));
+        Label pelicula = new Label("🎬 " + compra.funcion().getPelicula().getTitulo());
+        pelicula.getStyleClass().add("card-title");
+        Label identidad = new Label("Compra: " + compraId);
+        identidad.setId("compraIdLabel");
+        identidad.getStyleClass().add("helper-text");
+        boolean cancelada = compra.estaCancelada();
+        boolean reembolsada = registro.reembolso() != null;
+        boolean cancelable = cancelacionService.validarTiempo(compraId);
+        Label estado = new Label(cancelada ? (reembolsada ? "CANCELADA · REEMBOLSADA" : "CANCELADA")
+                : cancelable ? "CANCELABLE" : "NO CANCELABLE");
+        estado.setId("estadoCompraLabel");
+        estado.getStyleClass().add(cancelada ? "estado-inactivo" : "estado-activo");
+        Label fecha = new Label("📅 " + compra.funcion().getFechaHora().format(fechaFormatter));
+        Label sala = new Label("Sala: " + compra.funcion().getSala().getNumero());
+        Label asientos = new Label("Asientos: " + String.join(", ", compra.asientos()));
+        Label importe = new Label(String.format("Pagado con tarjeta: COP $%,.2f", registro.importePagado()));
+        importe.getStyleClass().add("stat-value");
+        Label politica = new Label(cancelada ? "Esta operación ya está cerrada."
+                : cancelable ? "Reembolso aplicable: " + Math.round(cancelacionService.porcentajeReembolso(compraId) * 100) + " % del dinero pagado."
+                : "No se permite cancelar a menos de 2 horas de la función.");
+        Button cancelar = new Button("Cancelar compra");
+        cancelar.setId("btnCancelarCompra");
+        cancelar.setUserData(compraId);
+        cancelar.getStyleClass().add("boton-peligro");
+        cancelar.setDisable(cancelada || !cancelable);
+        cancelar.setOnAction(e -> mostrarDialogoCancelacion(compraId, compra.funcion().getPelicula().getTitulo(), registro.importePagado().doubleValue()));
+        card.getChildren().addAll(pelicula, identidad, estado, fecha, sala, asientos, importe, politica);
+        if (reembolsada) {
+            Label devuelto = new Label(String.format("Reembolsado: COP $%,.2f · %.0f %%", registro.reembolso().montoReembolsado(), registro.reembolso().porcentajeAplicado() * 100));
+            devuelto.setId("valorReembolsoLabel");
+            devuelto.getStyleClass().add("mensaje-exito");
+            card.getChildren().add(devuelto);
         }
-        for (javafx.scene.Node nodo : card.getChildren()) {
-            if (nodo instanceof Label etiqueta) etiqueta.setWrapText(true);
-        }
+        card.getChildren().add(cancelar);
+        card.getChildren().forEach(n -> { if (n instanceof Label label) label.setWrapText(true); });
         return card;
     }
-
-    private Label calcularTiempoRestante(LocalDateTime fechaFuncion) {
-        LocalDateTime ahora = LocalDateTime.now();
-        Duration duracion = Duration.between(ahora, fechaFuncion);
-        long horas = duracion.toHours();
-
-        if (horas < 0) {
-            return new Label("⚠️ Función ya ocurrió");
-        } else if (horas < 2) {
-            return new Label("⚠️ Menos de 2h - No se permite cancelación");
-        } else if (horas < 24) {
-            return new Label("⏰ " + horas + "h restantes - Reembolso 80%");
-        } else {
-            return new Label("✅ " + horas + "h restantes - Reembolso 100%");
-        }
-    }
-
     private void mostrarDialogoCancelacion(String compraId, String peliculaTitulo, double monto) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         aplicarTema(alert);
@@ -168,7 +120,7 @@ private CancelacionService cancelacionService;
         motivoArea.setWrapText(true);
         motivoArea.setMaxHeight(100);
 
-        VBox content = new VBox(10, new Label("Motivo:"), motivoArea);
+        VBox content = new VBox(10, new Label(String.format("Importe realmente pagado: COP $%,.2f", monto)), new Label("Motivo:"), motivoArea);
         alert.getDialogPane().setContent(content);
 
         ButtonType btnConfirmar = new ButtonType("Confirmar Cancelación", ButtonBar.ButtonData.OK_DONE);
@@ -189,9 +141,9 @@ private CancelacionService cancelacionService;
 
     private void procesarCancelacion(String compraId, String motivo) {
         try {
-            Reembolso reembolso = cancelacionService.solicitarCancelacionPorCliente(compraId, motivo);
-            mostrarReembolsoExitoso(reembolso);
+            Reembolso reembolso = cancelacionService.solicitarCancelacionPorCliente(compraId, motivo, Navegador.getUsuarioActual().getId());
             cargarCompras();
+            mostrarReembolsoExitoso(reembolso);
         } catch (ReembolsoDuplicadoException e) {
             mostrarError("Esta compra ya ha sido reembolsada anteriormente");
         } catch (CompraException e) {
@@ -208,7 +160,7 @@ private CancelacionService cancelacionService;
         alert.setHeaderText("✅ Reembolso Exitoso");
 
         String mensaje = String.format(
-            "Monto reembolsado: COP $%,.0f\n" +
+            "Monto reembolsado: COP $%,.2f\n" +
             "Porcentaje aplicado: %.0f%%\n" +
             "Política: %s\n" +
             "Fecha: %s",

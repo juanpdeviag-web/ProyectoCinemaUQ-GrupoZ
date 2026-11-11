@@ -195,6 +195,17 @@ public class TarjetaVirtual {
         historialTransacciones.addAll(respaldo.historial());
     }
 
+    /** Reutiliza el respaldo de la tarjeta, incluso si ya no es la tarjeta actual del cliente. */
+    public synchronized <T> T ejecutarTransaccion(java.util.function.Supplier<T> operacion) {
+        Respaldo respaldo = respaldar();
+        try {
+            return operacion.get();
+        } catch (RuntimeException | Error fallo) {
+            restaurar(respaldo);
+            throw fallo;
+        }
+    }
+
     private String generarNumeroTarjeta() {
         return "TV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
