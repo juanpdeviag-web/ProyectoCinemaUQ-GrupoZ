@@ -184,8 +184,27 @@ public class AdminPanelController {
             CategoryAxis x=new CategoryAxis();NumberAxis y=new NumberAxis();BarChart<String,Number> grafico=new BarChart<>(x,y);grafico.setTitle("Ventas y reembolsos · COP");grafico.setLegendVisible(false);grafico.setMinWidth(0);grafico.setAnimated(false);XYChart.Series<String,Number> serie=new XYChart.Series<>();for(String k:List.of("Ventas cobradas","Reembolsos","Recargas"))serie.getData().add(new XYChart.Data<>(k,datos.get(k)));grafico.getData().add(serie);contenido.getChildren().add(grafico);
             PieChart pie=new PieChart();pie.setTitle("Estado de puntos · situación actual");pie.setAnimated(false);for(String k:List.of("Puntos disponibles","Puntos vencidos","Puntos redimidos"))if(datos.get(k)>0)pie.getData().add(new PieChart.Data(k,datos.get(k)));if(pie.getData().isEmpty())contenido.getChildren().add(etiqueta("Todavía no hay puntos para graficar.","empty-state"));else contenido.getChildren().add(pie);
         }
-        if(area.equals("Reportes")) {TextArea texto=new TextArea(servicio.reporte(desde.getValue(),hasta.getValue()));texto.setEditable(false);texto.setWrapText(true);texto.setPrefRowCount(22);contenido.getChildren().addAll(texto,boton("Exportar TXT","boton-principal",()->{
-            FileChooser fc=new FileChooser();fc.setTitle("Exportar reporte");fc.setInitialFileName("cinemauq-reporte.txt");fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texto UTF-8","*.txt"));var archivo=fc.showSaveDialog(contenido.getScene().getWindow());if(archivo!=null){try{servicio.exportarTxt(archivo.toPath(),desde.getValue(),hasta.getValue());mostrar("Reporte exportado: "+archivo.getName(),true);}catch(java.io.IOException e){throw new IllegalStateException("No fue posible exportar: "+e.getMessage(),e);}}
-        }));}
+        if(area.equals("Reportes")) {
+            TextArea texto=new TextArea(servicio.reporte(desde.getValue(),hasta.getValue()));
+            texto.setEditable(false);texto.setWrapText(true);texto.setPrefRowCount(22);
+
+            // Botones para exportar aplicando las estrategias TXT y PDF
+            Button btnTxt=boton("Exportar TXT","boton-principal",()->{
+                FileChooser fc=new FileChooser();fc.setTitle("Exportar reporte TXT");fc.setInitialFileName("cinemauq-reporte.txt");
+                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texto UTF-8","*.txt"));
+                var archivo=fc.showSaveDialog(contenido.getScene().getWindow());
+                if(archivo!=null){try{servicio.exportarTxt(archivo.toPath(),desde.getValue(),hasta.getValue());mostrar("Reporte TXT exportado: "+archivo.getName(),true);}catch(java.io.IOException e){throw new IllegalStateException("No fue posible exportar: "+e.getMessage(),e);}}
+            });
+
+            Button btnPdf=boton("Exportar PDF","boton-secundario",()->{
+                FileChooser fc=new FileChooser();fc.setTitle("Exportar reporte PDF");fc.setInitialFileName("cinemauq-reporte.pdf");
+                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Documento PDF","*.pdf"));
+                var archivo=fc.showSaveDialog(contenido.getScene().getWindow());
+                if(archivo!=null){try{servicio.exportarPdf(archivo.toPath(),desde.getValue(),hasta.getValue());mostrar("Reporte PDF exportado: "+archivo.getName(),true);}catch(java.io.IOException e){throw new IllegalStateException("No fue posible exportar: "+e.getMessage(),e);}}
+            });
+
+            FlowPane accionesReporte=new FlowPane(10,10,btnTxt,btnPdf);
+            contenido.getChildren().addAll(texto,accionesReporte);
+        }
     }
 }
