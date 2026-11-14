@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.nio.file.*;
 import java.io.IOException;
+import co.edu.uq.cinemauq.patterns.strategy.*;
 
 /** Fachada administrativa: autorización en cada operación, nunca en la apariencia de un botón. */
 public final class AdministracionService {
@@ -149,5 +150,24 @@ public final class AdministracionService {
         }
         for(String area:List.of("Compras","Confitería","Cancelaciones","Recargas","Puntos")) {b.append('\n').append(area.toUpperCase(Locale.ROOT)).append('\n'); consultar(area,desde,hasta,"").forEach(f->b.append(f).append('\n'));}return b.toString();
     }
-    public void exportarTxt(Path destino,LocalDate desde,LocalDate hasta) throws IOException { permiso(); Files.writeString(destino,reporte(desde,hasta),java.nio.charset.StandardCharsets.UTF_8); }
+
+    // Método principal Strategy: recibe cualquier exportador (TXT o PDF) y genera el archivo
+    public void exportar(ExportadorReporte estrategia, Path destino, LocalDate desde, LocalDate hasta) throws IOException {
+        permiso();
+        if (estrategia == null) {
+            throw new IllegalArgumentException("Se requiere una estrategia de exportación");
+        }
+        estrategia.exportar(reporte(desde, hasta), destino);
+    }
+
+    // Exporta en TXT usando la estrategia de texto
+    public void exportarTxt(Path destino, LocalDate desde, LocalDate hasta) throws IOException {
+        exportar(new ExportadorTxtStrategy(), destino, desde, hasta);
+    }
+
+    // Exporta en PDF usando la estrategia de documento PDF
+    public void exportarPdf(Path destino, LocalDate desde, LocalDate hasta) throws IOException {
+        exportar(new ExportadorPdfStrategy(), destino, desde, hasta);
+    }
+
 }
