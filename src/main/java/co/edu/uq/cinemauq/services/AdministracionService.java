@@ -3,6 +3,7 @@ package co.edu.uq.cinemauq.services;
 import co.edu.uq.cinemauq.core.domain.*;
 import co.edu.uq.cinemauq.core.managers.*;
 import co.edu.uq.cinemauq.core.seed.UserSeeder;
+import co.edu.uq.cinemauq.patterns.observer.EstadisticasManager;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
@@ -11,7 +12,6 @@ import java.nio.file.*;
 import java.io.IOException;
 import co.edu.uq.cinemauq.patterns.strategy.*;
 
-/** Fachada administrativa: autorización en cada operación, nunca en la apariencia de un botón. */
 public final class AdministracionService {
     private final Usuario usuario;
     private final CatalogoCinema catalogo;
@@ -40,10 +40,13 @@ public final class AdministracionService {
                     if(registro.listarCompras().stream().anyMatch(c->funciones.contains(c.compra().funcion().getId())&&c.compra().asientos().contains(anterior.valor("Código"))))throw new IllegalArgumentException("El asiento forma parte de una compra confirmada");
                 }
             }
-            return catalogo.guardar(tipo,id,datos,activa);
+            var resultado=catalogo.guardar(tipo,id,datos,activa);
+            if(tipo.equals("Funciones")&&id==null) {
+                EstadisticasManager.getInstance().notificarFuncionCreada();
+            }
+            return resultado;
         }
     }
-    /** Completa solo posiciones inexistentes; conserva IDs, accesibilidad y asientos deshabilitados. */
     public int completarAsientos(String salaId) {
         permiso(); synchronized(catalogo) {
             var sala=catalogo.ficha(salaId);if(!sala.tipo().equals("Salas"))throw new IllegalArgumentException("Selecciona una sala");
@@ -68,10 +71,11 @@ public final class AdministracionService {
         Cliente c=clientes("").stream().filter(x->x.getId().equals(clienteId)).findFirst().orElseThrow(()->new IllegalArgumentException("Cliente inexistente"));
         c.getTarjeta().ejecutarTransaccion(()->{
             if(!Double.isFinite(c.getTarjeta().getSaldo())||!Double.isFinite(c.getTarjeta().getSaldo()+monto.doubleValue()))throw new IllegalArgumentException("La recarga excede el saldo admitido");
-            c.getTarjeta().recargar(monto.doubleValue());return null;
+            c.getTarjeta().recargar(monto.doubleValue());
+            EstadisticasManager.getInstance().notificarRecarga();
+            return null;
         });
     }
-    /** Un único cerrojo de catálogo bloquea ventas mientras se cancela. Respalda todas las tarjetas del lote. */
     public int cancelarFuncion(String id,String motivo) {
         permiso(); if(motivo==null||motivo.isBlank()) throw new IllegalArgumentException("Indica el motivo");
         synchronized(catalogo) {
@@ -83,18 +87,25 @@ public final class AdministracionService {
                     for(var c:compras) servicio.solicitarCancelacionPorCine(c.compra().id(),motivo);
                     return compras.size(); });
             });
-            catalogo.activar(id,false); return resultado;
+            catalogo.activar(id,false);
+            EstadisticasManager.getInstance().notificarFuncionCancelada();
+            return resultado;
         }
     }
     private <T>T conTarjetas(List<TarjetaVirtual> tarjetas,int i,Supplier<T> tarea) { return i==tarjetas.size()?tarea.get():tarjetas.get(i).ejecutarTransaccion(()->conTarjetas(tarjetas,i+1,tarea)); }
     private Map<String,String> fila(String... valores) { Map<String,String> r=new LinkedHashMap<>(); for(int i=0;i<valores.length;i+=2)r.put(valores[i],valores[i+1]); return r; }
     private boolean fecha(LocalDateTime f,LocalDate desde,LocalDate hasta) { return !f.toLocalDate().isBefore(desde)&&!f.toLocalDate().isAfter(hasta); }
     public List<Map<String,String>> consultar(String area,LocalDate desde,LocalDate hasta,String busqueda) {
+        return consultar(area, desde, hasta, busqueda, null);
+    }
+    
+    public List<Map<String,String>> consultar(String area,LocalDate desde,LocalDate hasta,String busqueda, String clienteId) {
         permiso(); if(desde==null||hasta==null||desde.isAfter(hasta)) throw new IllegalArgumentException("Rango de fechas inválido");
         List<Map<String,String>> filas=new ArrayList<>();
         switch(area) {
-            case "Confitería" -> {for(var c:compras())if(fecha(c.compra().fechaCompra(),desde,hasta))for(var item:c.detallePago().items())filas.add(fila("Compra",c.compra().id(),"Fecha",c.compra().fechaCompra().toString(),"Artículo",item.nombre(),"Tipo",item.combo()?"COMBO":"PRODUCTO","Cantidad",""+item.cantidad(),"Precio unitario",item.precioUnitario().toPlainString(),"Subtotal",item.precioUnitario().multiply(BigDecimal.valueOf(item.cantidad())).toPlainString(),"Estado",c.reembolso()!=null?"REEMBOLSADA":c.compra().estaCancelada()?"CANCELADA":"CONFIRMADA"));}
+            case "Confitería" -> {for(var c:compras())if(fecha(c.compra().fechaCompra(),desde,hasta)&&(clienteId==null||c.cliente().getId().equals(clienteId)))for(var item:c.detallePago().items())filas.add(fila("Compra",c.compra().id(),"Fecha",c.compra().fechaCompra().toString(),"Artículo",item.nombre(),"Tipo",item.combo()?"COMBO":"PRODUCTO","Cantidad",""+item.cantidad(),"Precio unitario",item.precioUnitario().toPlainString(),"Subtotal",item.precioUnitario().multiply(BigDecimal.valueOf(item.cantidad())).toPlainString(),"Estado",c.reembolso()!=null?"REEMBOLSADA":c.compra().estaCancelada()?"CANCELADA":"CONFIRMADA"));}
             case "Compras", "Cancelaciones" -> { for(var c:compras()) {
+                if(clienteId!=null&&!c.cliente().getId().equals(clienteId))continue;
                 if(area.equals("Cancelaciones")&&c.reembolso()==null)continue;
                 var fecha=area.equals("Cancelaciones")?c.reembolso().fechaReembolso():c.compra().fechaCompra(); if(!fecha(fecha,desde,hasta))continue;
                 var r=fila("ID",c.compra().id(),"Cliente",c.cliente().getNombre(),"Película",c.compra().funcion().getPelicula().getTitulo(),"Función",c.compra().funcion().getFechaHora().toString(),"Sala",c.compra().funcion().getSala().getNumero(),"Asientos",String.join(", ",c.compra().asientos()),"Confitería",String.join(", ",c.compra().snacks()),"Pagado",c.importePagado().toPlainString(),"Fecha",fecha.toString(),"Estado",c.reembolso()!=null?"REEMBOLSADA":c.compra().estaCancelada()?"CANCELADA":"CONFIRMADA");
@@ -102,9 +113,10 @@ public final class AdministracionService {
                 r.put("Descuento puntos",c.detallePago().descuentoPuntos().toPlainString());
                 r.put("Entradas",c.detallePago().entradas().toPlainString());r.put("Confitería subtotal",c.detallePago().confiteria().toPlainString());r.put("Descuento promociones",c.detallePago().descuentoPromociones().toPlainString());
                 if(c.reembolso()!=null) {r.put("Porcentaje",""+(c.reembolso().porcentajeAplicado()*100));r.put("Reembolso",""+c.reembolso().montoReembolsado());}
-                filas.add(r);
+ filas.add(r);
             }}
             case "Clientes", "Tarjetas", "Recargas", "Puntos" -> { for(Cliente c:clientes("")) {
+                if(clienteId!=null&&!c.getId().equals(clienteId))continue;
                 if(area.equals("Clientes")) filas.add(fila("ID",c.getId(),"Nombre",c.getNombre(),"Correo",c.getCorreo(),"Compras",""+compras().stream().filter(x->x.cliente().getId().equals(c.getId())).count(),"Tarjeta",c.getTarjeta().getNumeroTarjeta(),"Saldo",""+c.getTarjeta().getSaldo(),"Puntos disponibles",""+c.getPuntos()));
                 if(area.equals("Tarjetas")) filas.add(fila("Cliente ID",c.getId(),"Cliente",c.getNombre(),"Tarjeta",c.getTarjeta().getNumeroTarjeta(),"Saldo",""+c.getTarjeta().getSaldo(),"Estado",c.getTarjeta().isActiva()?"ACTIVA":"INACTIVA"));
                 if(area.equals("Recargas")) for(var t:c.getTarjeta().obtenerHistorial()) if(t.tipo()==TipoTransaccion.RECARGA&&fecha(t.fecha(),desde,hasta)) filas.add(fila("Cliente",c.getNombre(),"ID",t.id(),"Fecha",t.fecha().toString(),"Monto",""+t.monto(),"Descripción",t.descripcion()));
@@ -141,17 +153,37 @@ public final class AdministracionService {
         r.put("Puntos disponibles",(double)disponibles);r.put("Puntos vencidos",(double)vencidos);r.put("Puntos redimidos",(double)redimidos);return r;
     }
     public String reporte(LocalDate desde,LocalDate hasta) {
-        permiso();StringBuilder b=new StringBuilder("CinemaUQ · Reporte administrativo\nDesde "+desde+" hasta "+hasta+"\nCatálogo y saldo de puntos: situación actual. Otros indicadores: intervalo indicado.\n\n");
+        return reporte(desde, hasta, null);
+    }
+    
+    public String reporte(LocalDate desde,LocalDate hasta, String clienteId) {
+        permiso();StringBuilder b=new StringBuilder("CinemaUQ · Reporte administrativo\nDesde "+desde+" hasta "+hasta);
+        if(clienteId != null) {
+            var cliente = clientes("").stream().filter(c -> c.getId().equals(clienteId)).findFirst().orElse(null);
+            if(cliente != null) b.append("\nCliente: ").append(cliente.getNombre());
+        }
+        b.append("\nCatálogo y saldo de puntos: situación actual. Otros indicadores: intervalo indicado.\n\n");
         indicadores(desde,hasta).forEach((k,v)->b.append(k).append(": ").append(v).append('\n'));
         b.append("\nENTRADAS Y OCUPACIÓN POR FUNCIÓN\n");
+        int contador=1;
         for(var ficha:catalogo.listar("Funciones")) {var f=catalogo.funcion(ficha.id());if(!fecha(f.getFechaHora(),desde,hasta))continue;
-            long entradas=compras().stream().filter(c->c.compra().funcion().getId().equals(f.getId())&&!c.compra().estaCancelada()).mapToLong(c->c.compra().asientos().size()).sum();
-            b.append(f.getId()).append(" · ").append(f.getPelicula()).append(" · ").append(f.getSala().getNumero()).append(" · ").append(f.getFechaHora()).append(" · entradas activas: ").append(entradas).append(" / ").append(f.getSala().calcularCapacidad()).append('\n');
+            long entradas=compras().stream().filter(c->c.compra().funcion().getId().equals(f.getId())&&!c.compra().estaCancelada()&&(clienteId==null||c.cliente().getId().equals(clienteId))).mapToLong(c->c.compra().asientos().size()).sum();
+            b.append("#").append(contador++).append(" · ").append(f.getPelicula()).append(" · ").append(f.getSala().getNumero()).append(" · ").append(f.getFechaHora()).append(" · entradas activas: ").append(entradas).append(" / ").append(f.getSala().calcularCapacidad()).append('\n');
         }
-        for(String area:List.of("Compras","Confitería","Cancelaciones","Recargas","Puntos")) {b.append('\n').append(area.toUpperCase(Locale.ROOT)).append('\n'); consultar(area,desde,hasta,"").forEach(f->b.append(f).append('\n'));}return b.toString();
+        for(String area:List.of("Compras","Confitería","Cancelaciones","Recargas","Puntos")) {b.append('\n').append(area.toUpperCase(Locale.ROOT)).append('\n'); consultar(area,desde,hasta,"",clienteId).forEach(f->b.append(formatearFilaReporte(f)).append('\n'));}return b.toString();
     }
-
-    // Método principal Strategy: recibe cualquier exportador (TXT o PDF) y genera el archivo
+    private String formatearFilaReporte(Map<String,String> fila) {
+        StringBuilder sb = new StringBuilder();
+        fila.forEach((k,v)->{
+            if(!k.equals("ID") && !k.equals("Cliente ID") && !k.equals("Compra")) {
+                sb.append(k).append(": ").append(v).append(" | ");
+            }
+        });
+        if(sb.length() > 3) {
+            sb.setLength(sb.length() - 3);
+        }
+        return sb.toString();
+    }
     public void exportar(ExportadorReporte estrategia, Path destino, LocalDate desde, LocalDate hasta) throws IOException {
         permiso();
         if (estrategia == null) {
@@ -159,13 +191,9 @@ public final class AdministracionService {
         }
         estrategia.exportar(reporte(desde, hasta), destino);
     }
-
-    // Exporta en TXT usando la estrategia de texto
     public void exportarTxt(Path destino, LocalDate desde, LocalDate hasta) throws IOException {
         exportar(new ExportadorTxtStrategy(), destino, desde, hasta);
     }
-
-    // Exporta en PDF usando la estrategia de documento PDF
     public void exportarPdf(Path destino, LocalDate desde, LocalDate hasta) throws IOException {
         exportar(new ExportadorPdfStrategy(), destino, desde, hasta);
     }

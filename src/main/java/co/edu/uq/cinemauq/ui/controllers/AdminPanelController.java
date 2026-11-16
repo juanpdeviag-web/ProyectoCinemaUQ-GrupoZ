@@ -3,6 +3,7 @@ package co.edu.uq.cinemauq.ui.controllers;
 import co.edu.uq.cinemauq.core.domain.Usuario;
 import co.edu.uq.cinemauq.services.*;
 import co.edu.uq.cinemauq.ui.utils.Navegador;
+import co.edu.uq.cinemauq.patterns.observer.*;
 import javafx.fxml.FXML;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
@@ -15,7 +16,6 @@ import java.time.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-/** Presentación administrativa: formularios de catálogo y consultas financieras de solo lectura. */
 public class AdminPanelController {
     @FXML private VBox contenido;
     @FXML private FlowPane navegacion;
@@ -31,6 +31,10 @@ public class AdminPanelController {
     private String area="Dashboard";
     private TableView<Map<String,String>> tabla;
     private final List<String> areas=List.of("Dashboard","Películas","Salas","Asientos","Funciones","Productos","Combos","Promociones","Clientes","Tarjetas","Recargas","Compras","Cancelaciones","Puntos","Reportes","Gráficos");
+    private EstadisticasManager estadisticasManager;
+    private GraficoVentasObserver graficoVentasObserver;
+    private GraficoOcupacionObserver graficoOcupacionObserver;
+    private GraficoProductosObserver graficoProductosObserver;
     @FXML private void initialize() {
         desde.setValue(LocalDate.now().withDayOfMonth(1)); hasta.setValue(LocalDate.now().plusMonths(1));
         contenido.setMinWidth(0);
@@ -48,10 +52,13 @@ public class AdminPanelController {
     }
     public void cargarDatos(Usuario usuario) {
         try {
-            // Se verifica también la identidad autenticada del navegador; no se confía en un argumento externo.
             AdministracionService.autorizar(Navegador.getUsuarioActual());
             if(usuario!=Navegador.getUsuarioActual())throw new SecurityException("Acceso denegado");
             servicio=new AdministracionService(usuario);
+            estadisticasManager = EstadisticasManager.getInstance();
+            estadisticasManager.setServicio(servicio);
+            estadisticasManager.setRangoFechas(desde.getValue(), hasta.getValue());
+            
             navegacion.getChildren().clear();
             for(String nombre:areas) {Button b=new Button(nombre);b.getStyleClass().add("nav-item");b.setMaxWidth(Double.MAX_VALUE);b.setOnAction(e->{area=nombre;busqueda.clear();actualizar();});navegacion.getChildren().add(b);}
             actualizar();
@@ -68,6 +75,8 @@ public class AdminPanelController {
             if(desde.getValue()==null||hasta.getValue()==null||desde.getValue().isAfter(hasta.getValue()))throw new IllegalArgumentException("Selecciona un intervalo válido");
             titulo.setText(area);contenido.getChildren().clear();
             navegacion.getChildren().forEach(n->{n.getStyleClass().remove("nav-item-active");if(n instanceof Button b&&b.getText().equals(area))n.getStyleClass().add("nav-item-active");});
+            busqueda.setVisible(!area.equals("Gráficos") && !area.equals("Reportes"));
+            busqueda.setManaged(!area.equals("Gráficos") && !area.equals("Reportes"));
             if(!CatalogoCinema.campos(area).isEmpty())catalogo();
             else if(area.equals("Dashboard")||area.equals("Reportes")||area.equals("Gráficos"))resumen();
             else consulta();
@@ -178,17 +187,99 @@ public class AdminPanelController {
     private void resumen() {
         var datos=servicio.indicadores(desde.getValue(),hasta.getValue());
         contenido.getChildren().add(etiqueta("Catálogo y puntos: estado actual. Operaciones: intervalo seleccionado. Ocupación: funciones del intervalo.","app-subtitle"));
-        if(area.equals("Dashboard")) {TilePane tarjetas=new TilePane(14,14);tarjetas.setPrefColumns(3);
+        if(area.equals("Dashboard")) {
+            contenido.getChildren().add(boton("Cargar datos de prueba","boton-principal",()->{
+                ejecutar(()->{
+                    estadisticasManager.notificarDatosIniciales();
+                    actualizar();
+                    mostrar("Datos de prueba cargados correctamente",true);
+                });
+            }));
+            contenido.getChildren().add(etiqueta("Carga datos iniciales: películas, salas, funciones, productos y clientes de prueba.","mensaje-info"));
+            TilePane tarjetas=new TilePane(14,14);tarjetas.setPrefColumns(3);
             datos.forEach((k,v)->{VBox card=new VBox(8,etiqueta(k,"stat-label"),etiqueta(String.format(java.util.Locale.forLanguageTag("es-CO"),"%,.2f",v),"stat-value"));card.getStyleClass().add("stat-card");card.setPrefWidth(215);tarjetas.getChildren().add(card);});contenido.getChildren().add(tarjetas);}
         if(area.equals("Gráficos")) {
-            CategoryAxis x=new CategoryAxis();NumberAxis y=new NumberAxis();BarChart<String,Number> grafico=new BarChart<>(x,y);grafico.setTitle("Ventas y reembolsos · COP");grafico.setLegendVisible(false);grafico.setMinWidth(0);grafico.setAnimated(false);XYChart.Series<String,Number> serie=new XYChart.Series<>();for(String k:List.of("Ventas cobradas","Reembolsos","Recargas"))serie.getData().add(new XYChart.Data<>(k,datos.get(k)));grafico.getData().add(serie);contenido.getChildren().add(grafico);
-            PieChart pie=new PieChart();pie.setTitle("Estado de puntos · situación actual");pie.setAnimated(false);for(String k:List.of("Puntos disponibles","Puntos vencidos","Puntos redimidos"))if(datos.get(k)>0)pie.getData().add(new PieChart.Data(k,datos.get(k)));if(pie.getData().isEmpty())contenido.getChildren().add(etiqueta("Todavía no hay puntos para graficar.","empty-state"));else contenido.getChildren().add(pie);
+            ComboBox<String> selectorCliente = new ComboBox<>();
+            selectorCliente.getItems().add("Todos los clientes");
+            servicio.clientes("").forEach(c -> selectorCliente.getItems().add(c.getNombre() + " (" + c.getId() + ")"));
+            selectorCliente.setValue("Todos los clientes");
+            selectorCliente.setPromptText("Seleccionar cliente");
+            
+            HBox filtroCliente = new HBox(10, etiqueta("Filtrar por cliente:", "form-label"), selectorCliente);
+            contenido.getChildren().add(filtroCliente);
+            estadisticasManager.setRangoFechas(desde.getValue(), hasta.getValue());
+            estadisticasManager.setClienteSeleccionado(null);
+            selectorCliente.setOnAction(e -> {
+                String seleccion = selectorCliente.getValue();
+                String clienteId = null;
+                if (!seleccion.equals("Todos los clientes")) {
+                    int idx = seleccion.lastIndexOf("(");
+                    if (idx > 0) {
+                        clienteId = seleccion.substring(idx + 1, seleccion.length() - 1);
+                    }
+                }
+                estadisticasManager.setClienteSeleccionado(clienteId);
+                estadisticasManager.actualizarEstadisticas();
+            });
+            BarChart<String,Number> graficoVentas = GraficoVentasObserver.crearGrafico();
+            graficoVentasObserver = new GraficoVentasObserver(graficoVentas);
+            estadisticasManager.registrarObserver(graficoVentasObserver);
+            contenido.getChildren().add(graficoVentas);
+            PieChart graficoPuntos = GraficoOcupacionObserver.crearGrafico();
+            graficoOcupacionObserver = new GraficoOcupacionObserver(graficoPuntos);
+            estadisticasManager.registrarObserver(graficoOcupacionObserver);
+            contenido.getChildren().add(graficoPuntos);
+            LineChart<Number,Number> graficoTendencia = GraficoProductosObserver.crearGrafico();
+            graficoProductosObserver = new GraficoProductosObserver(graficoTendencia);
+            estadisticasManager.registrarObserver(graficoProductosObserver);
+            contenido.getChildren().add(graficoTendencia);
+            estadisticasManager.actualizarEstadisticas();
+            contenido.getChildren().add(boton("Actualizar gráficos","boton-secundario",()->{
+                estadisticasManager.setRangoFechas(desde.getValue(), hasta.getValue());
+                String seleccion = selectorCliente.getValue();
+                String clienteId = null;
+                if (!seleccion.equals("Todos los clientes")) {
+                    int idx = seleccion.lastIndexOf("(");
+                    if (idx > 0) {
+                        clienteId = seleccion.substring(idx + 1, seleccion.length() - 1);
+                    }
+                }
+                estadisticasManager.setClienteSeleccionado(clienteId);
+                estadisticasManager.actualizarEstadisticas();
+                mostrar("Gráficos actualizados",true);
+            }));
         }
         if(area.equals("Reportes")) {
-            TextArea texto=new TextArea(servicio.reporte(desde.getValue(),hasta.getValue()));
+            ComboBox<String> selectorClienteReporte = new ComboBox<>();
+            selectorClienteReporte.getItems().add("Todos los clientes");
+            servicio.clientes("").forEach(c -> selectorClienteReporte.getItems().add(c.getNombre() + " (" + c.getId() + ")"));
+            selectorClienteReporte.setValue("Todos los clientes");
+            selectorClienteReporte.setPromptText("Seleccionar cliente");
+            
+            HBox filtroClienteReporte = new HBox(10, etiqueta("Filtrar por cliente:", "form-label"), selectorClienteReporte);
+            contenido.getChildren().add(filtroClienteReporte);
+            String clienteId = null;
+            String seleccion = selectorClienteReporte.getValue();
+            if (!seleccion.equals("Todos los clientes")) {
+                int idx = seleccion.lastIndexOf("(");
+                if (idx > 0) {
+                    clienteId = seleccion.substring(idx + 1, seleccion.length() - 1);
+                }
+            }
+            
+            TextArea texto=new TextArea(servicio.reporte(desde.getValue(),hasta.getValue(), clienteId));
             texto.setEditable(false);texto.setWrapText(true);texto.setPrefRowCount(22);
-
-            // Botones para exportar aplicando las estrategias TXT y PDF
+            selectorClienteReporte.setOnAction(e -> {
+                String nuevaSeleccion = selectorClienteReporte.getValue();
+                String nuevoClienteId = null;
+                if (!nuevaSeleccion.equals("Todos los clientes")) {
+                    int idx = nuevaSeleccion.lastIndexOf("(");
+                    if (idx > 0) {
+                        nuevoClienteId = nuevaSeleccion.substring(idx + 1, nuevaSeleccion.length() - 1);
+                    }
+                }
+                texto.setText(servicio.reporte(desde.getValue(),hasta.getValue(), nuevoClienteId));
+            });
             Button btnTxt=boton("Exportar TXT","boton-principal",()->{
                 FileChooser fc=new FileChooser();fc.setTitle("Exportar reporte TXT");fc.setInitialFileName("cinemauq-reporte.txt");
                 fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texto UTF-8","*.txt"));
