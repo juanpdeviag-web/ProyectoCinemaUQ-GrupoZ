@@ -113,6 +113,7 @@ public class UserSeeder {
         return cargarUsuarios().stream()
             .filter(u -> u instanceof Cliente)
             .map(u -> (Cliente) u)
+            .peek(c -> { if (c.getTarjeta().getSaldo() == 0) { double[] saldos={85000,120000,45000,200000,67500}; int i=Integer.parseInt(c.getId().substring(3))-1; if(i>=0&&i<saldos.length)c.getTarjeta().agregarSaldoSinTransaccion(saldos[i]); } })
             .toList();
     }
 
