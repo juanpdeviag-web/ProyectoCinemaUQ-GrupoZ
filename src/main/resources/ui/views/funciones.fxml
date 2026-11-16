@@ -1,64 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uq.cinemauq.ui.controllers.FuncionesController"
-            stylesheets="@../styles/estilos.css"
-            styleClass="root">
-
-    <top>
-        <VBox styleClass="header">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Label fx:id="peliculaTituloLabel" text="Película" styleClass="title">
-                <font>
-                    <Font name="Arial Bold" size="26"/>
-                </font>
-            </Label>
-            <Label fx:id="peliculaInfoLabel" text="Información" styleClass="subtitle">
-                <font>
-                    <Font name="Arial" size="14"/>
-                </font>
-            </Label>
-        </VBox>
-    </top>
-
-    <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
-            <VBox spacing="20" styleClass="content" maxWidth="800">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-
-                <Label text="Funciones disponibles:" styleClass="section-title">
-                    <font>
-                        <Font name="Arial Bold" size="18"/>
-                    </font>
-                </Label>
-
-                <VBox fx:id="funcionesContainer" spacing="15" styleClass="funciones-container" minWidth="600" prefWidth="600">
-                </VBox>
-            </VBox>
-        </ScrollPane>
-    </center>
-
-    <bottom>
-        <HBox alignment="CENTER" spacing="20" styleClass="footer">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
-        </HBox>
-    </bottom>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Group?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.FuncionesController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page">
+ <top><EncabezadoCinema titulo="Elige tu función" subtitulo="1. Función  ·  2. Asientos  ·  3. Confitería  ·  4. Pago" activa=""/></top>
+ <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><VBox styleClass="content-container" alignment="TOP_CENTER">
+  <VBox maxWidth="1300" spacing="20" alignment="TOP_CENTER" styleClass="app-container">
+<VBox spacing="8" maxWidth="1000">
+ <Label fx:id="peliculaTituloLabel" text="Selecciona una película" styleClass="section-title" wrapText="true"/>
+ <Label fx:id="peliculaInfoLabel" styleClass="helper-text" wrapText="true"/>
+</VBox>
+<FlowPane fx:id="funcionesContainer" hgap="16" vgap="16" maxWidth="1000" alignment="CENTER"/>
+  </VBox>
+ </VBox></ScrollPane></center>
+ <bottom><FlowPane styleClass="app-footer" alignment="CENTER" hgap="12" vgap="8">
+<Button fx:id="btnVolver" text="Volver a cartelera" onAction="#onVolver" styleClass="boton-secundario"/>
+ </FlowPane></bottom>
 </BorderPane>

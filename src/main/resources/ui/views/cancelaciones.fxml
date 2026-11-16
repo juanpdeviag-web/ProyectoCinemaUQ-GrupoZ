@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Group?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.CancelacionController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page">
+ <top><EncabezadoCinema titulo="Cancelaciones y reembolsos" subtitulo="Consulta los plazos y revisa las opciones de cada compra." activa="mis_tickets"/></top>
+ <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><VBox styleClass="content-container" alignment="TOP_CENTER">
+  <VBox maxWidth="1300" spacing="20" alignment="TOP_CENTER" styleClass="app-container">
+<Label text="Políticas de cancelación" styleClass="section-title"/>
+<FlowPane hgap="16" vgap="16" alignment="CENTER">
+ <VBox styleClass="stat-card" spacing="8"><Label text="Más de 24 horas" styleClass="stat-label"/><Label text="100 %" styleClass="stat-value"/><Label text="del importe reembolsable"/></VBox>
+ <VBox styleClass="stat-card" spacing="8"><Label text="Entre 2 y 24 horas" styleClass="stat-label"/><Label text="80 %" styleClass="stat-value"/><Label text="del importe reembolsable"/></VBox>
+ <VBox styleClass="stat-card" spacing="8"><Label text="Menos de 2 horas" styleClass="stat-label"/><Label text="No permitido" styleClass="stat-value"/><Label text="No se admite cancelación"/></VBox>
+</FlowPane>
+<Label text="Si el cine cancela la función, el reembolso es del 100 %." wrapText="true" styleClass="mensaje-info"/>
+<Label text="Mis compras" styleClass="section-title"/>
+<Label fx:id="sinComprasLabel" text="No tienes compras registradas." wrapText="true" styleClass="empty-state"/>
+<VBox fx:id="comprasContainer" spacing="16" maxWidth="1000"/>
+  </VBox>
+ </VBox></ScrollPane></center>
+ <bottom><FlowPane styleClass="app-footer" alignment="CENTER" hgap="12" vgap="8">
+<Button fx:id="btnVolver" text="Volver a mis tickets" onAction="#onVolver" styleClass="boton-secundario"/>
+ </FlowPane></bottom>
+</BorderPane>

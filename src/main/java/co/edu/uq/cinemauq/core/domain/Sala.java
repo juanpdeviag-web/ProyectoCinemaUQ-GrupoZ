@@ -44,6 +44,13 @@ public class Sala {
         return numero;
     }
 
+    public void configurar(String numero, int filas, int columnas) {
+        new Sala(numero, filas, columnas).validar();
+        this.numero = numero;
+        this.capacidadFilas = filas;
+        this.capacidadColumnas = columnas;
+    }
+
     public int getCapacidadFilas() {
         return capacidadFilas;
     }

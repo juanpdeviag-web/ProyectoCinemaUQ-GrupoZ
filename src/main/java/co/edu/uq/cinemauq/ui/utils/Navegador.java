@@ -21,6 +21,8 @@ public class Navegador {
     private static SesionCompra sesionCompra;
     private static Usuario usuarioActual;
     private static List<ReservaAsiento> reservasSeleccionadas;
+    private static co.edu.uq.cinemauq.core.repository.UserRepository userRepository;
+    private static co.edu.uq.cinemauq.core.ports.IPagoProcessor pagoProcessor;
 
     /**
      * Inicializa el navegador con el Stage principal y la sesión de compra.
@@ -63,9 +65,13 @@ public class Navegador {
                 ((co.edu.uq.cinemauq.ui.controllers.AdminPanelController) controller).cargarDatos(usuarioActual);
             }
 
-            Scene scene = new Scene(root, 1920, 1080);
             primaryStage.setTitle(titulo);
-            primaryStage.setScene(scene);
+            if (primaryStage.getScene() == null) {
+                primaryStage.setScene(new Scene(root));
+            } else {
+                // Conservar la escena y el tamaño de la ventana al cambiar de vista.
+                primaryStage.getScene().setRoot(root);
+            }
             primaryStage.show();
         } catch (IOException e) {
             System.err.println("Error al cargar la vista: " + fxmlPath);
@@ -121,5 +127,33 @@ public class Navegador {
      */
     public static List<ReservaAsiento> getReservasSeleccionadas() {
         return reservasSeleccionadas;
+    }
+
+    /**
+     * Establece el UserRepository para los servicios.
+     */
+    public static void setUserRepository(co.edu.uq.cinemauq.core.repository.UserRepository repo) {
+        userRepository = repo;
+    }
+
+    /**
+     * Obtiene el UserRepository.
+     */
+    public static co.edu.uq.cinemauq.core.repository.UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    /**
+     * Establece el PagoProcessor para los servicios.
+     */
+    public static void setPagoProcessor(co.edu.uq.cinemauq.core.ports.IPagoProcessor processor) {
+        pagoProcessor = processor;
+    }
+
+    /**
+     * Obtiene el PagoProcessor.
+     */
+    public static co.edu.uq.cinemauq.core.ports.IPagoProcessor getPagoProcessor() {
+        return pagoProcessor;
     }
 }

@@ -8,9 +8,9 @@ import co.edu.uq.cinemauq.ui.utils.Navegador;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
+
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -27,6 +27,9 @@ public class TicketController implements Initializable {
 
     @FXML
     private Label peliculaLabel;
+
+    @FXML private Label compraIdLabel;
+    @FXML private Label estadoCompraLabel;
 
     @FXML
     private Label fechaLabel;
@@ -52,24 +55,12 @@ public class TicketController implements Initializable {
     @FXML
     private Button btnVolver;
 
-    @FXML
-    private Button btnSalir;
-
-    @FXML
-    private VBox perfilContainer;
-
-    @FXML
-    private Label perfilNombreLabel;
-
-    @FXML
-    private Label perfilRolLabel;
-
     private List<ReservaAsiento> reservas;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cargarUltimaReserva();
-        configurarMenuPerfil();
+
     }
 
     /**
@@ -89,6 +80,11 @@ public class TicketController implements Initializable {
 
         // Usar la primera reserva para la información común
         ReservaAsiento primeraReserva = reservas.get(0);
+        compraIdLabel.setText("Compra: " + primeraReserva.getCompraId());
+        compraIdLabel.setUserData(primeraReserva.getCompraId());
+        var registro = ReservasManager.getInstance().buscarCompra(primeraReserva.getCompraId());
+        estadoCompraLabel.setText(registro != null && registro.compra().estaCancelada()
+                ? "CANCELADA · REEMBOLSADA" : "COMPRA CONFIRMADA");
 
         // Mostrar información de la película
         peliculaLabel.setText(primeraReserva.getPeliculaTitulo());
@@ -113,24 +109,16 @@ public class TicketController implements Initializable {
         usuarioLabel.setText("Cliente: " + primeraReserva.getUsuarioNombre());
 
         // Calcular total sumando todos los asientos
-        double total = reservas.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
-        totalLabel.setText(String.format("Total: COP $%,.0f", total));
+        double total = registro != null ? registro.importePagado().doubleValue()
+                : reservas.stream().mapToDouble(ReservaAsiento::getMontoPagado).sum();
+        totalLabel.setText(String.format("Total pagado: COP $%,.2f", total));
 
         // Mostrar fecha de compra (usar la última reserva)
         ReservaAsiento ultimaReserva = reservas.get(reservas.size() - 1);
         DateTimeFormatter compraFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
         fechaCompraLabel.setText("Compra realizada: " + ultimaReserva.getFechaCompra().format(compraFormatter));
 
-        // Actualizar header
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual != null) {
-            perfilNombreLabel.setText(usuarioActual.getNombre());
-            if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Administrador) {
-                perfilRolLabel.setText("Rol: Administrador");
-            } else {
-                perfilRolLabel.setText("Rol: Cliente");
-            }
-        }
+
     }
 
     /**
@@ -143,74 +131,16 @@ public class TicketController implements Initializable {
             return;
         }
 
-        List<ReservaAsiento> todasLasReservas = ReservasManager.getInstance().getReservasPorUsuario(usuarioId);
-        if (todasLasReservas.isEmpty()) {
-            System.err.println("Error: No hay reservas para el usuario");
+        var compras = ReservasManager.getInstance().listarComprasPorUsuario(usuarioId);
+        if (compras.isEmpty()) {
+            peliculaLabel.setText("No tienes compras confirmadas para mostrar.");
             return;
         }
-
-        // Obtener todas las reservas de la misma función (las más recientes)
-        // Agrupar por función y tomar el grupo más reciente
-        String ultimaFuncionId = todasLasReservas.get(todasLasReservas.size() - 1).getFuncionId();
-        List<ReservaAsiento> reservasMismaFuncion = todasLasReservas.stream()
-            .filter(r -> r.getFuncionId().equals(ultimaFuncionId))
-            .collect(Collectors.toList());
-
-        cargarDatos(reservasMismaFuncion);
+        cargarDatos(compras.getLast().reservas());
     }
-
     @FXML
     private void onVolver() {
         Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
     }
 
-    @FXML
-    private void onSalir() {
-        System.exit(0);
-    }
-
-    private void configurarMenuPerfil() {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem miCuentaItem = new MenuItem("👤 Mi Cuenta");
-        miCuentaItem.setOnAction(event -> onMiCuenta());
-
-        MenuItem tarjetaVirtualItem = new MenuItem("💳 Tarjeta Virtual");
-        tarjetaVirtualItem.setOnAction(event -> onTarjetaVirtual());
-
-        MenuItem misTicketsItem = new MenuItem("🎟️ Mis Tickets");
-        misTicketsItem.setOnAction(event -> onMisTickets());
-
-        MenuItem carteleraItem = new MenuItem("🎬 Ir a Cartelera");
-        carteleraItem.setOnAction(event -> onIrACartelera());
-
-        menu.getItems().addAll(miCuentaItem, tarjetaVirtualItem, misTicketsItem, carteleraItem);
-
-        perfilContainer.setOnMouseClicked(event -> {
-            menu.show(perfilContainer, event.getScreenX(), event.getScreenY());
-        });
-    }
-
-    @FXML
-    private void onMiCuenta() {
-        Navegador.navegarA("/ui/views/mi_cuenta.fxml", "CinemaUQ - Mi Cuenta");
-    }
-
-    @FXML
-    private void onTarjetaVirtual() {
-        Usuario usuarioActual = Navegador.getUsuarioActual();
-        if (usuarioActual instanceof co.edu.uq.cinemauq.core.domain.Cliente) {
-            Navegador.navegarA("/ui/views/tarjeta_virtual.fxml", "CinemaUQ - Tarjeta Virtual");
-        }
-    }
-
-    @FXML
-    private void onMisTickets() {
-        Navegador.navegarA("/ui/views/mis_tickets.fxml", "CinemaUQ - Mis Tickets");
-    }
-
-    @FXML
-    private void onIrACartelera() {
-        Navegador.navegarA("/ui/views/cartelera.fxml", "CinemaUQ - Cartelera de Películas");
-    }
 }

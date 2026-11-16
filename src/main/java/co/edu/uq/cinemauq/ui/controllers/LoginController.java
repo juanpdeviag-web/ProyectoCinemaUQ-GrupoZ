@@ -33,6 +33,9 @@ public class LoginController implements Initializable {
     private Label infoLabel;
 
     @FXML
+    private Label usuarioSeleccionadoLabel;
+
+    @FXML
     private Button btnIniciarSesion;
 
     @FXML
@@ -67,17 +70,17 @@ public class LoginController implements Initializable {
     private VBox crearEntradaContrasena(Usuario usuario) {
         VBox entry = new VBox();
         entry.setSpacing(4);
-        entry.setStyle("-fx-background-color: #FAF8F5; -fx-background-radius: 8; -fx-padding: 8;");
+        entry.getStyleClass().add("demo-entry");
 
         Label nombreLabel = new Label(usuario.getNombre());
-        nombreLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #4A3F35;");
+        nombreLabel.getStyleClass().add("form-label");
         nombreLabel.setWrapText(true);
 
         Label idLabel = new Label(usuario.getId());
-        idLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #8B7355;");
+        idLabel.getStyleClass().add("helper-text");
 
         Label contrasenaLabel = new Label("Pass: " + UserSeeder.getContrasena(usuario.getId()));
-        contrasenaLabel.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-text-fill: #C4A77D; -fx-font-weight: bold;");
+        contrasenaLabel.getStyleClass().add("demo-password");
 
         entry.getChildren().addAll(nombreLabel, idLabel, contrasenaLabel);
         return entry;
@@ -103,7 +106,10 @@ public class LoginController implements Initializable {
         correoLabel.getStyleClass().add("usuario-correo");
         correoLabel.setWrapText(true);
 
-        card.getChildren().addAll(iconoLabel, nombreLabel, rolLabel, correoLabel);
+        Button seleccionar = new Button("Seleccionar usuario");
+        seleccionar.getStyleClass().add("boton-secundario");
+        seleccionar.setOnAction(event -> onUsuarioSeleccionado(usuario));
+        card.getChildren().addAll(iconoLabel, nombreLabel, rolLabel, correoLabel, seleccionar);
 
         // Al hacer clic en la tarjeta, seleccionar el usuario
         card.setOnMouseClicked(event -> onUsuarioSeleccionado(usuario));
@@ -117,16 +123,21 @@ public class LoginController implements Initializable {
         // Deseleccionar todas las tarjetas
         for (javafx.scene.Node node : usuariosTilePane.getChildren()) {
             node.getStyleClass().remove("usuario-card-selected");
+            VBox tarjeta = (VBox) node;
+            ((Button) tarjeta.getChildren().getLast()).setText("Seleccionar usuario");
         }
 
         // Seleccionar la tarjeta clickeada
         VBox selectedCard = (VBox) usuariosTilePane.getChildren().get(UserSeeder.cargarUsuarios().indexOf(usuario));
         selectedCard.getStyleClass().add("usuario-card-selected");
+        ((Button) selectedCard.getChildren().getLast()).setText("Seleccionado ✓");
+        usuarioSeleccionadoLabel.setText("Usuario seleccionado: " + usuario.getNombre());
 
         if (usuarioSeleccionado != null) {
             System.out.println("Usuario seleccionado: " + usuarioSeleccionado.getNombre() + " (" + usuarioSeleccionado.getId() + ")");
             infoLabel.setText("Usuario seleccionado: " + usuarioSeleccionado.getNombre() + ". Ingresa tu contraseña.");
-            infoLabel.setStyle("-fx-text-fill: #8B7355;");
+            estiloMensaje("mensaje-info");
+            contrasenaField.requestFocus();
         }
     }
 
@@ -134,14 +145,15 @@ public class LoginController implements Initializable {
     private void onIniciarSesion() {
         if (usuarioSeleccionado == null) {
             infoLabel.setText("Por favor selecciona un usuario");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            estiloMensaje("mensaje-error");
             return;
         }
 
         String contrasena = contrasenaField.getText();
         if (contrasena == null || contrasena.trim().isEmpty()) {
             infoLabel.setText("Por favor ingresa tu contraseña");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            estiloMensaje("mensaje-error");
+            contrasenaField.requestFocus();
             return;
         }
 
@@ -162,7 +174,7 @@ public class LoginController implements Initializable {
             }
         } else {
             infoLabel.setText("Contraseña incorrecta. Intenta nuevamente.");
-            infoLabel.setStyle("-fx-text-fill: #e94560;");
+            estiloMensaje("mensaje-error");
             contrasenaField.clear();
         }
     }
@@ -170,6 +182,11 @@ public class LoginController implements Initializable {
     @FXML
     private void onCrearUsuario() {
         Navegador.navegarA("/ui/views/crear_usuario.fxml", "CinemaUQ - Crear Usuario");
+    }
+
+    private void estiloMensaje(String estilo) {
+        infoLabel.getStyleClass().removeAll("mensaje-info", "mensaje-error", "mensaje-exito");
+        infoLabel.getStyleClass().add(estilo);
     }
 
     @FXML

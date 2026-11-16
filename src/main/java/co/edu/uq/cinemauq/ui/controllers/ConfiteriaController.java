@@ -26,82 +26,59 @@ import java.util.ResourceBundle;
  * Muestra productos y combos usando el patrón Composite.
  */
 public class ConfiteriaController implements Initializable {
-    
+
     @FXML
     private TilePane productosTilePane;
-    
+
+    @FXML private TilePane combosTilePane;
+    @FXML private Label combosSeleccionadosLabel;
+
     @FXML
     private Label productosSeleccionadosLabel;
-    
+
     @FXML
     private Label totalLabel;
-    
+
     @FXML
     private Button btnContinuar;
-    
+
     @FXML
     private Button btnVolver;
-    
+
     @FXML
     private Button btnSaltar;
-    
+
     private SesionCompra sesionCompra;
     private List<ItemCompra> productosDisponibles;
     private Map<ItemCompra, Integer> cantidadesSeleccionadas;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.cantidadesSeleccionadas = new HashMap<>();
     }
-    
+
     public void cargarDatos(SesionCompra sesionCompra) {
         this.sesionCompra = sesionCompra;
         cargarProductos();
         actualizarResumen();
     }
-    
+
     private void cargarProductos() {
-        productosDisponibles = new ArrayList<>();
-        
-        // Productos individuales (precios en COP)
-        productosDisponibles.add(new Producto("Palomitas", 32000.0));
-        productosDisponibles.add(new Producto("Refresco", 20000.0));
-        productosDisponibles.add(new Producto("Nachos", 40000.0));
-        productosDisponibles.add(new Producto("Hot Dog", 48000.0));
-        productosDisponibles.add(new Producto("Agua", 12000.0));
-        productosDisponibles.add(new Producto("Chocolates", 24000.0));
+        productosDisponibles = co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().confiteria();
 
-        // Combos
-        Combo combo1 = new Combo("Combo Cine")
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Refresco", 20000.0));
-        productosDisponibles.add(combo1);
-
-        Combo combo2 = new Combo("Combo Familiar")
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Palomitas", 32000.0))
-            .agregar(new Producto("Refresco", 20000.0))
-            .agregar(new Producto("Nachos", 40000.0));
-        productosDisponibles.add(combo2);
-
-        Combo combo3 = new Combo("Combo Deluxe")
-            .agregar(new Producto("Hot Dog", 48000.0))
-            .agregar(new Producto("Refresco", 20000.0))
-            .agregar(new Producto("Chocolates", 24000.0));
-        productosDisponibles.add(combo3);
-        
         renderizarProductos();
     }
-    
+
     private void renderizarProductos() {
         productosTilePane.getChildren().clear();
-        
+        combosTilePane.getChildren().clear();
+
         for (ItemCompra producto : productosDisponibles) {
             VBox productoCard = crearTarjetaProducto(producto);
-            productosTilePane.getChildren().add(productoCard);
+            (producto instanceof Combo ? combosTilePane : productosTilePane).getChildren().add(productoCard);
         }
     }
-    
+
     private VBox crearTarjetaProducto(ItemCompra producto) {
         VBox card = new VBox();
         card.getStyleClass().add("producto-card");
@@ -114,6 +91,7 @@ public class ConfiteriaController implements Initializable {
         Label nombreLabel = new Label(producto.getNombre());
         nombreLabel.getStyleClass().add("producto-nombre");
         nombreLabel.setAlignment(javafx.geometry.Pos.CENTER);
+        nombreLabel.setWrapText(true);
 
         Label precioLabel = new Label(String.format("$%,.0f", producto.getPrecio()));
         precioLabel.getStyleClass().add("producto-precio");
@@ -140,7 +118,14 @@ public class ConfiteriaController implements Initializable {
 
         cantidadBox.getChildren().addAll(btnMenos, cantidadLabel, btnMas);
 
-        card.getChildren().addAll(iconoLabel, nombreLabel, precioLabel, cantidadBox);
+        Label descripcion = new Label(producto instanceof Combo combo
+                ? combo.getItems().stream().map(ItemCompra::getNombre).collect(java.util.stream.Collectors.joining(" + "))
+                : co.edu.uq.cinemauq.services.CatalogoCinema.getInstance().listar("Productos").stream().filter(p -> p.valor("Nombre").equals(producto.getNombre())).map(p -> p.valor("Descripción")).findFirst().orElse("Producto individual"));
+        descripcion.setWrapText(true);
+        descripcion.getStyleClass().add("product-description");
+        javafx.scene.layout.Region espacio = new javafx.scene.layout.Region();
+        VBox.setVgrow(espacio, javafx.scene.layout.Priority.ALWAYS);
+        card.getChildren().addAll(iconoLabel, nombreLabel, descripcion, espacio, precioLabel, cantidadBox);
 
         return card;
     }
@@ -155,7 +140,7 @@ public class ConfiteriaController implements Initializable {
         if (nombre.contains("Combo")) return "🎁";
         return "🍴";
     }
-    
+
     private void onAgregarProducto(ItemCompra producto) {
         int cantidad = cantidadesSeleccionadas.getOrDefault(producto, 0);
         cantidad++;
@@ -184,7 +169,9 @@ public class ConfiteriaController implements Initializable {
 
     private void actualizarCantidadLabel(ItemCompra producto, int cantidad) {
         String id = "cantidad-" + producto.getNombre().replace(" ", "_");
-        for (javafx.scene.Node node : productosTilePane.getChildren()) {
+        List<javafx.scene.Node> tarjetas = new ArrayList<>(productosTilePane.getChildren());
+        tarjetas.addAll(combosTilePane.getChildren());
+        for (javafx.scene.Node node : tarjetas) {
             if (node instanceof VBox) {
                 VBox card = (VBox) node;
                 for (javafx.scene.Node child : card.getChildren()) {
@@ -216,29 +203,37 @@ public class ConfiteriaController implements Initializable {
         }
 
         totalLabel.setText(String.format("Total confitería: COP $%,.2f", sesionCompra.getPrecioProductos()));
+        productosSeleccionadosLabel.setText("Productos: " + cantidadesSeleccionadas.entrySet().stream()
+                .filter(e -> !(e.getKey() instanceof Combo) && e.getValue() > 0)
+                .map(e -> e.getKey().getNombre() + " ×" + e.getValue())
+                .collect(java.util.stream.Collectors.joining(", ")));
+        combosSeleccionadosLabel.setText("Combos: " + cantidadesSeleccionadas.entrySet().stream()
+                .filter(e -> e.getKey() instanceof Combo && e.getValue() > 0)
+                .map(e -> e.getKey().getNombre() + " ×" + e.getValue())
+                .collect(java.util.stream.Collectors.joining(", ")));
 
         btnContinuar.setDisable(false); // Se puede continuar sin productos
     }
-    
+
     @FXML
     private void onContinuar() {
         System.out.println("Continuar a resumen de compra");
         Navegador.navegarA("/ui/views/compra.fxml", "CinemaUQ - Resumen de Compra");
     }
-    
+
     @FXML
     private void onVolver() {
         sesionCompra.limpiarProductos();
         cantidadesSeleccionadas.clear();
         Navegador.navegarA("/ui/views/asientos.fxml", "CinemaUQ - Selección de Asientos");
     }
-    
+
     @FXML
     private void onSaltar() {
         System.out.println("Saltar confitería");
         Navegador.navegarA("/ui/views/compra.fxml", "CinemaUQ - Resumen de Compra");
     }
-    
+
     public SesionCompra getSesionCompra() {
         return sesionCompra;
     }

@@ -38,7 +38,7 @@ public class CompraBuilder {
             throw new IllegalStateException("Una compra requiere al menos una función y un asiento.");
         }
         else  {
-            return new Compra(funcion, asientos, snacks);
+            return Compra.crear(funcion, asientos, snacks);
         }
      }
 
@@ -68,7 +68,7 @@ public class CompraBuilder {
 
     public Compra buildValidado() {
         validarEstado();
-        Compra compra = new Compra(funcion, asientos, snacks);
+        Compra compra = Compra.crear(funcion, asientos, snacks);
         compra.validar();
         return compra;
     }

@@ -21,7 +21,7 @@ public class AsientosManager {
     /**
      * Obtiene la instancia única del gestor (Singleton).
      */
-    public static AsientosManager getInstance() {
+    public static synchronized AsientosManager getInstance() {
         if (instance == null) {
             instance = new AsientosManager();
         }
@@ -33,8 +33,8 @@ public class AsientosManager {
      * @param funcionId Identificador único de la función
      * @return Set con los IDs de asientos ocupados
      */
-    public Set<String> getAsientosOcupados(String funcionId) {
-        return asientosOcupadosPorFuncion.getOrDefault(funcionId, new HashSet<>());
+    public synchronized Set<String> getAsientosOcupados(String funcionId) {
+        return Set.copyOf(asientosOcupadosPorFuncion.getOrDefault(funcionId, Set.of()));
     }
 
     /**
@@ -42,7 +42,7 @@ public class AsientosManager {
      * @param funcionId Identificador único de la función
      * @param asientos Set con los IDs de asientos a marcar como ocupados
      */
-    public void marcarAsientosOcupados(String funcionId, Set<String> asientos) {
+    public synchronized void marcarAsientosOcupados(String funcionId, Set<String> asientos) {
         asientosOcupadosPorFuncion.computeIfAbsent(funcionId, k -> new HashSet<>()).addAll(asientos);
         System.out.println("Asientos marcados como ocupados para función " + funcionId + ": " + asientos);
     }
@@ -52,7 +52,7 @@ public class AsientosManager {
      * @param funcionId Identificador único de la función
      * @param asientoId ID del asiento a marcar como ocupado
      */
-    public void marcarAsientoOcupado(String funcionId, String asientoId) {
+    public synchronized void marcarAsientoOcupado(String funcionId, String asientoId) {
         asientosOcupadosPorFuncion.computeIfAbsent(funcionId, k -> new HashSet<>()).add(asientoId);
         System.out.println("Asiento " + asientoId + " marcado como ocupado para función " + funcionId);
     }
@@ -62,7 +62,7 @@ public class AsientosManager {
      * @param funcionId Identificador único de la función
      * @param asientos Set con los IDs de asientos a liberar
      */
-    public void liberarAsientos(String funcionId, Set<String> asientos) {
+    public synchronized void liberarAsientos(String funcionId, Set<String> asientos) {
         Set<String> ocupados = asientosOcupadosPorFuncion.get(funcionId);
         if (ocupados != null) {
             ocupados.removeAll(asientos);
@@ -76,7 +76,7 @@ public class AsientosManager {
      * @param asientoId ID del asiento a verificar
      * @return true si el asiento está ocupado, false en caso contrario
      */
-    public boolean isAsientoOcupado(String funcionId, String asientoId) {
+    public synchronized boolean isAsientoOcupado(String funcionId, String asientoId) {
         Set<String> ocupados = asientosOcupadosPorFuncion.get(funcionId);
         return ocupados != null && ocupados.contains(asientoId);
     }
@@ -85,7 +85,7 @@ public class AsientosManager {
      * Limpia todos los asientos ocupados para una función específica.
      * @param funcionId Identificador único de la función
      */
-    public void limpiarFuncion(String funcionId) {
+    public synchronized void limpiarFuncion(String funcionId) {
         asientosOcupadosPorFuncion.remove(funcionId);
         System.out.println("Asientos limpiados para función " + funcionId);
     }
@@ -93,8 +93,20 @@ public class AsientosManager {
     /**
      * Limpia todos los asientos ocupados (útil para reiniciar la aplicación).
      */
-    public void limpiarTodo() {
+    public synchronized void limpiarTodo() {
         asientosOcupadosPorFuncion.clear();
         System.out.println("Todos los asientos ocupados han sido limpiados");
+    }
+
+    public synchronized <T> T ejecutarTransaccion(java.util.function.Supplier<T> operacion) {
+        Map<String, Set<String>> respaldo = new HashMap<>();
+        asientosOcupadosPorFuncion.forEach((id, asientos) -> respaldo.put(id, new HashSet<>(asientos)));
+        try {
+            return operacion.get();
+        } catch (RuntimeException | Error fallo) {
+            asientosOcupadosPorFuncion.clear();
+            asientosOcupadosPorFuncion.putAll(respaldo);
+            throw fallo;
+        }
     }
 }

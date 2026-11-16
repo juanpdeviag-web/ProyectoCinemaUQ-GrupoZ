@@ -1,131 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.TilePane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uq.cinemauq.ui.controllers.CarteleraController"
-            stylesheets="@../styles/estilos.css"
-            styleClass="root">
-
-    <top>
-        <VBox styleClass="header">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-
-            <!-- Header principal -->
-            <HBox alignment="CENTER" spacing="20">
-                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
-                    <VBox spacing="5">
-                        <Label text="🎬 CinemaUQ" styleClass="title">
-                            <font>
-                                <Font name="Segoe UI Bold" size="28"/>
-                            </font>
-                        </Label>
-                        <Label text="Cartelera de Películas" styleClass="subtitle">
-                            <font>
-                                <Font name="Segoe UI" size="14"/>
-                            </font>
-                        </Label>
-                    </VBox>
-                </HBox>
-
-                <HBox alignment="CENTER" spacing="12">
-                    <VBox fx:id="perfilContainer" spacing="4" styleClass="perfil-container" style="-fx-cursor: hand;">
-                        <padding>
-                            <Insets top="6" right="15" bottom="6" left="15"/>
-                        </padding>
-                        <Label fx:id="perfilNombreLabel" text="" styleClass="perfil-nombre">
-                            <font>
-                                <Font name="Segoe UI Bold" size="14"/>
-                            </font>
-                        </Label>
-                        <Label fx:id="perfilRolLabel" text="" styleClass="perfil-rol">
-                            <font>
-                                <Font name="Segoe UI" size="12"/>
-                            </font>
-                        </Label>
-                    </VBox>
-                    <Button fx:id="btnLogin" text="Iniciar Sesión" onAction="#onLogin" styleClass="button-primary" prefWidth="110" prefHeight="36"/>
-                    <Button fx:id="btnAdminPanel" text="Admin" onAction="#onAdminPanel" styleClass="button-admin" prefWidth="85" prefHeight="36" visible="false" managed="false"/>
-                </HBox>
-            </HBox>
-
-            <!-- Barra de búsqueda y filtros -->
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="search-bar">
-                <padding>
-                    <Insets top="12" right="0" bottom="0" left="0"/>
-                </padding>
-                <TextField fx:id="searchField" promptText="🔍 Buscar película..." prefWidth="250" prefHeight="35" styleClass="search-field"/>
-                <ComboBox fx:id="filtroGenero" promptText="Todos los géneros" prefWidth="150" prefHeight="35" styleClass="filter-combo"/>
-                <Label text="Ordenar por:" styleClass="filter-label">
-                    <font>
-                        <Font name="Segoe UI" size="13"/>
-                    </font>
-                </Label>
-                <ComboBox fx:id="ordenarPor" promptText="Relevancia" prefWidth="130" prefHeight="35" styleClass="filter-combo"/>
-            </HBox>
-        </VBox>
-    </top>
-
-    <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="main-scroll">
-            <VBox spacing="25" styleClass="content">
-                <padding>
-                    <Insets top="25" right="30" bottom="25" left="30"/>
-                </padding>
-                
-                <HBox alignment="CENTER_LEFT" spacing="15">
-                    <Label text="🎥 Películas en Cartelera" styleClass="section-title">
-                        <font>
-                            <Font name="Segoe UI Bold" size="24"/>
-                        </font>
-                    </Label>
-                    <Label fx:id="contadorPeliculas" text="(0 películas)" styleClass="counter-label">
-                        <font>
-                            <Font name="Segoe UI" size="14"/>
-                        </font>
-                    </Label>
-                </HBox>
-                
-                <TilePane fx:id="peliculasTilePane" 
-                          prefColumns="4" 
-                          hgap="25" 
-                          vgap="25"
-                          styleClass="tile-pane">
-                </TilePane>
-            </VBox>
-        </ScrollPane>
-    </center>
-
-    <bottom>
-        <VBox styleClass="footer">
-            <padding>
-                <Insets top="12" right="20" bottom="12" left="20"/>
-            </padding>
-            <HBox alignment="CENTER" spacing="15">
-                <Label text="© 2026 CinemaUQ - Sistema de Gestión de Cine" styleClass="footer-text">
-                    <font>
-                        <Font name="Segoe UI" size="12"/>
-                    </font>
-                </Label>
-                <HBox HBox.hgrow="ALWAYS"/>
-                <Button text="Salir" onAction="#onSalir" styleClass="button-secondary" prefWidth="85" prefHeight="34"/>
-            </HBox>
-        </VBox>
-    </bottom>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import co.edu.uq.cinemauq.ui.controllers.EncabezadoCinema?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.CarteleraController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, uniform-page, cartelera-page">
+ <top><EncabezadoCinema titulo="CinemaUQ" subtitulo="Tu próxima historia comienza aquí." activa="cartelera"/></top>
+ <center><ScrollPane fx:id="carteleraScroll" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
+  <VBox styleClass="content-container" alignment="TOP_CENTER">
+   <VBox styleClass="app-container, movies-container" maxWidth="1300" spacing="24">
+    <VBox styleClass="card, filters-container" spacing="18">
+     <Label text="Encuentra tu película" styleClass="section-title"/>
+     <GridPane fx:id="filtrosGrid" hgap="20" vgap="16">
+      <VBox fx:id="busquedaFiltro" spacing="8" GridPane.columnIndex="0" minWidth="0">
+       <Label text="Buscar por título o género" labelFor="$searchField" styleClass="form-label"/>
+       <TextField fx:id="searchField" promptText="Escribe un título o género" styleClass="form-field"/>
+      </VBox>
+      <VBox fx:id="generoFiltro" spacing="8" GridPane.columnIndex="1" minWidth="0">
+       <Label text="Género" labelFor="$filtroGenero" styleClass="form-label"/>
+       <ComboBox fx:id="filtroGenero" promptText="Todos los géneros" maxWidth="Infinity" styleClass="form-field"/>
+      </VBox>
+      <VBox fx:id="ordenFiltro" spacing="8" GridPane.columnIndex="2" minWidth="0">
+       <Label text="Ordenar por" labelFor="$ordenarPor" styleClass="form-label"/>
+       <ComboBox fx:id="ordenarPor" promptText="Relevancia" maxWidth="Infinity" styleClass="form-field"/>
+      </VBox>
+     </GridPane>
+    </VBox>
+    <FlowPane hgap="14" vgap="8" alignment="CENTER_LEFT">
+     <Label text="Películas en cartelera" styleClass="section-title"/>
+     <Label fx:id="contadorPeliculas" text="(0 películas)" styleClass="counter-label"/>
+    </FlowPane>
+    <Label fx:id="sinPeliculasLabel" text="No encontramos películas con estos filtros. Prueba otro título o género."
+           styleClass="empty-state" wrapText="true" visible="false" managed="false"/>
+    <TilePane fx:id="peliculasTilePane" prefColumns="4" hgap="24" vgap="24" tileAlignment="TOP_LEFT" alignment="TOP_CENTER" styleClass="movie-grid"/>
+   </VBox>
+  </VBox>
+ </ScrollPane></center>
+ <bottom><StackPane styleClass="app-footer">
+  <FlowPane styleClass="app-container" maxWidth="1300" hgap="20" vgap="10" alignment="CENTER_LEFT">
+   <Label text="CinemaUQ · Vive el cine" styleClass="helper-text"/>
+   <Button text="Salir de la aplicación" onAction="#onSalir" styleClass="boton-texto"/>
+  </FlowPane>
+ </StackPane></bottom>
 </BorderPane>

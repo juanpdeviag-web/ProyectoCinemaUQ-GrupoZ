@@ -1,121 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.TilePane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="co.edu.uq.cinemauq.ui.controllers.LoginController"
-            stylesheets="@../styles/estilos.css"
-            styleClass="root">
-
-    <top>
-        <VBox styleClass="header">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <Label text="🔐 Iniciar Sesión" styleClass="title">
-                <font>
-                    <Font name="Segoe UI Bold" size="28"/>
-                </font>
-            </Label>
-            <Label text="Selecciona tu usuario para continuar" styleClass="subtitle">
-                <font>
-                    <Font name="Segoe UI" size="14"/>
-                </font>
-            </Label>
-        </VBox>
-    </top>
-
-    <center>
-        <HBox spacing="20">
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" HBox.hgrow="ALWAYS">
-                <VBox spacing="25" styleClass="content">
-                    <padding>
-                        <Insets top="25" right="20" bottom="25" left="20"/>
-                    </padding>
-
-                    <Label text="Selecciona tu usuario:" styleClass="section-title">
-                        <font>
-                            <Font name="Segoe UI Bold" size="20"/>
-                        </font>
-                    </Label>
-
-                    <TilePane fx:id="usuariosTilePane"
-                              prefColumns="3"
-                              hgap="20"
-                              vgap="20"
-                              styleClass="tile-pane">
-                    </TilePane>
-
-                    <VBox spacing="15" styleClass="resumen-container" maxWidth="500" alignment="CENTER">
-                        <padding>
-                            <Insets top="25" right="30" bottom="25" left="30"/>
-                        </padding>
-
-                        <VBox spacing="10">
-                            <Label text="Contraseña:" styleClass="resumen-label">
-                                <font>
-                                    <Font name="Segoe UI" size="14"/>
-                                </font>
-                            </Label>
-                            <PasswordField fx:id="contrasenaField" prefWidth="400" prefHeight="40" promptText="Ingresa tu contraseña"/>
-                        </VBox>
-
-                        <Label fx:id="infoLabel" text="Selecciona un usuario para continuar" styleClass="resumen-label">
-                            <font>
-                                <Font name="Segoe UI" size="14"/>
-                            </font>
-                        </Label>
-                    </VBox>
-                </VBox>
-            </ScrollPane>
-
-            <VBox spacing="10" styleClass="resumen-container" prefWidth="280">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-
-                <Label text="🔐 Contraseñas de Prueba" styleClass="section-title">
-                    <font>
-                        <Font name="Segoe UI Bold" size="16"/>
-                    </font>
-                </Label>
-
-                <Label text="(Solo para demostración)" styleClass="resumen-label" wrapText="true">
-                    <font>
-                        <Font name="Segoe UI" size="11"/>
-                    </font>
-                </Label>
-
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="contrasenasContainer" spacing="8">
-                    </VBox>
-                </ScrollPane>
-            </VBox>
-        </HBox>
-    </center>
-
-    <bottom>
-        <VBox styleClass="footer">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
-            <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="btnVolver" text="Volver" onAction="#onVolver" styleClass="button-secondary"/>
-                <Button fx:id="btnCrearUsuario" text="Crear Usuario" onAction="#onCrearUsuario" styleClass="button-secondary"/>
-                <Button fx:id="btnIniciarSesion" text="Iniciar Sesión" onAction="#onIniciarSesion" styleClass="button-primary"/>
-            </HBox>
-        </VBox>
-    </bottom>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+ fx:controller="co.edu.uq.cinemauq.ui.controllers.LoginController"
+ stylesheets="@../styles/estilos.css" styleClass="root-app, login-page">
+ <top><VBox styleClass="app-header" spacing="6">
+  <Label text="CinemaUQ · Iniciar sesión" styleClass="app-title" wrapText="true"/>
+  <Label text="Elige tu perfil e ingresa tu contraseña para continuar." styleClass="app-subtitle" wrapText="true"/>
+  <Button fx:id="btnVolver" text="Volver a cartelera" onAction="#onVolver" styleClass="logout-button"/>
+ </VBox></top>
+ <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><VBox alignment="TOP_CENTER" styleClass="content-container" spacing="14">
+  <VBox maxWidth="820" spacing="14" alignment="TOP_CENTER">
+   <Label text="Selecciona tu usuario" styleClass="section-title"/>
+   <TilePane fx:id="usuariosTilePane" prefColumns="3" hgap="12" vgap="12" prefTileWidth="250" prefTileHeight="184" alignment="TOP_CENTER" tileAlignment="TOP_LEFT"/>
+   <VBox styleClass="form-container" maxWidth="540" spacing="12">
+    <Label text="Accede a tu cuenta" styleClass="section-title"/>
+    <Label fx:id="usuarioSeleccionadoLabel" text="Selecciona un usuario arriba." styleClass="form-label" wrapText="true"/>
+    <Label text="Contraseña" labelFor="$contrasenaField" styleClass="form-label"/>
+    <PasswordField fx:id="contrasenaField" promptText="Tu contraseña" onAction="#onIniciarSesion" styleClass="form-field"/>
+    <Label fx:id="infoLabel" text="Selecciona un usuario para continuar." wrapText="true" styleClass="mensaje-info"/>
+    <Button fx:id="btnIniciarSesion" text="Iniciar sesión" onAction="#onIniciarSesion" styleClass="boton-principal" maxWidth="Infinity"/>
+    <Separator/>
+    <Label text="¿Es tu primera visita?" styleClass="form-label"/>
+    <Button fx:id="btnCrearUsuario" text="Crear una cuenta" onAction="#onCrearUsuario" styleClass="boton-secundario"/>
+   </VBox>
+   <TitledPane text="Ver credenciales de demostración" expanded="false" maxWidth="540" styleClass="demo-panel">
+    <VBox spacing="12">
+     <Label text="Solo para probar la aplicación. Selecciona arriba el usuario correspondiente." wrapText="true" styleClass="helper-text"/>
+     <VBox fx:id="contrasenasContainer" spacing="8"/>
+    </VBox>
+   </TitledPane>
+  </VBox>
+ </VBox></ScrollPane></center>
 
 </BorderPane>
